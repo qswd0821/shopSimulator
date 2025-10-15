@@ -1,4 +1,7 @@
+ï»¿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour
 {
@@ -16,10 +19,16 @@ public class Player : MonoBehaviour
     float v;
 
     Item AttachItem;
+    int Money;
+
+    [SerializeField]
+    Ui_MoneyText Ui_MoneyText;
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;   // ¸¶¿ì½º Ä¿¼­¸¦ È­¸é ¾È¿¡¼­ °íÁ¤
-        Cursor.visible = false;                     // ¸¶¿ì½º Ä¿¼­¸¦ º¸ÀÌÁö ¾Êµµ·Ï ¼³Á¤
+        Cursor.lockState = CursorLockMode.Locked;   // ë§ˆìš°ìŠ¤ ì»¤ì„œë¥¼ í™”ë©´ ì•ˆì—ì„œ ê³ ì •
+        Cursor.visible = false;                     // ë§ˆìš°ìŠ¤ ì»¤ì„œë¥¼ ë³´ì´ì§€ ì•Šë„ë¡ ì„¤ì •
+        
+        Money = 0;
     }
 
     private void Update()
@@ -39,73 +48,100 @@ public class Player : MonoBehaviour
         float mouseX = Input.GetAxisRaw("Mouse X") * MouseSpeed * Time.deltaTime;
         float mouseY = Input.GetAxisRaw("Mouse Y") * MouseSpeed * Time.deltaTime;
 
-        YRotation += mouseX;    // ¸¶¿ì½º XÃà ÀÔ·Â¿¡ µû¶ó ¼öÆò È¸Àü °ªÀ» Á¶Á¤
-        XRotation -= mouseY;    // ¸¶¿ì½º YÃà ÀÔ·Â¿¡ µû¶ó ¼öÁ÷ È¸Àü °ªÀ» Á¶Á¤
+        YRotation += mouseX;    // ë§ˆìš°ìŠ¤ Xì¶• ì…ë ¥ì— ë”°ë¼ ìˆ˜í‰ íšŒì „ ê°’ì„ ì¡°ì •
+        XRotation -= mouseY;    // ë§ˆìš°ìŠ¤ Yì¶• ì…ë ¥ì— ë”°ë¼ ìˆ˜ì§ íšŒì „ ê°’ì„ ì¡°ì •
 
-        XRotation = Mathf.Clamp(XRotation, -90f, 90f);  // ¼öÁ÷ È¸Àü °ªÀ» -90µµ¿¡¼­ 90µµ »çÀÌ·Î Á¦ÇÑ
+        XRotation = Mathf.Clamp(XRotation, -90f, 90f);  // ìˆ˜ì§ íšŒì „ ê°’ì„ -90ë„ì—ì„œ 90ë„ ì‚¬ì´ë¡œ ì œí•œ
 
-        Cam.transform.rotation = Quaternion.Euler(XRotation, YRotation, 0); // Ä«¸Ş¶óÀÇ È¸ÀüÀ» Á¶Àı
-        transform.rotation = Quaternion.Euler(0, YRotation, 0);             // ÇÃ·¹ÀÌ¾î Ä³¸¯ÅÍÀÇ È¸ÀüÀ» Á¶Àı
+        Cam.transform.rotation = Quaternion.Euler(XRotation, YRotation, 0); // ì¹´ë©”ë¼ì˜ íšŒì „
+        transform.rotation = Quaternion.Euler(0, YRotation, 0);             // í”Œë ˆì´ì–´ ìºë¦­í„°ì˜ íšŒì „
     }
 
     void Move()
     {
-        h = Input.GetAxisRaw("Horizontal"); // ¼öÆò ÀÌµ¿ ÀÔ·Â °ª
-        v = Input.GetAxisRaw("Vertical");   // ¼öÁ÷ ÀÌµ¿ ÀÔ·Â °ª
+        h = Input.GetAxisRaw("Horizontal"); // ìˆ˜í‰ ì´ë™ ì…ë ¥ ê°’
+        v = Input.GetAxisRaw("Vertical");   // ìˆ˜ì§ ì´ë™ ì…ë ¥ ê°’
 
-        // ÀÔ·Â¿¡ µû¶ó ÀÌµ¿ ¹æÇâ º¤ÅÍ °è»ê
         Vector3 moveVec = transform.forward * v + transform.right * h;
-
-        // ÀÌµ¿ º¤ÅÍ¸¦ Á¤±ÔÈ­ÇÏ¿© ÀÌµ¿ ¼Óµµ¿Í ½Ã°£ °£°İÀ» °öÇÑ ÈÄ ÇöÀç À§Ä¡¿¡ ´õÇÔ
         transform.position += moveVec.normalized * MoveSpeed * Time.deltaTime;
     }
 
     void Ray()
     {
-        // È­¸é Áß¾Ó ÁÂÇ¥ °è»ê
+        // í™”ë©´ ì¤‘ì•™ ì¢Œí‘œ ê³„ì‚°
         Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
 
-        // ·¹ÀÌ »ı¼º
+        // ë ˆì´ ìƒì„±
         Ray ray = Cam.ScreenPointToRay(screenCenter);
 
-        // ·¹ÀÌ ½Ã°¢È­ (Scene ºä¿¡¼­¸¸ º¸ÀÓ)
+        // ë ˆì´ ì‹œê°í™” (Scene ë·°ì—ì„œë§Œ ë³´ì„)
         Debug.DrawRay(ray.origin, ray.direction * RayDistance, Color.red);
 
-        // ½ÇÁ¦ ·¹ÀÌÄ³½ºÆ®
+        // ì‹¤ì œ ë ˆì´ìºìŠ¤íŠ¸
         if (Physics.Raycast(ray, out RaycastHit hit, RayDistance))
         {
-            Debug.Log("Ãæµ¹ÇÑ ¿ÀºêÁ§Æ®: " + hit.collider.name);
+            Debug.Log("ì¶©ëŒí•œ ì˜¤ë¸Œì íŠ¸: " + hit.collider.name);
 
-            if(Input.GetMouseButtonDown(0)) // ÁÂÅ¬¸¯
+            // GameObject ìì²´
+            GameObject obj = hit.collider.gameObject;
+
+            if (Input.GetMouseButtonDown(0)) // ì¢Œí´ë¦­
             {
+                WorldSpaceUiClick(hit);
+
                 if(AttachItem == null)
                 {
-                    // GameObject ÀÚÃ¼
-                    GameObject obj = hit.collider.gameObject;
-
-                    // Item ½ºÅ©¸³Æ®¸¦ °¡Áø ¿ÀºêÁ§Æ®ÀÎÁö È®ÀÎ
+                    // Item ìŠ¤í¬ë¦½íŠ¸ë¥¼ ê°€ì§„ ì˜¤ë¸Œì íŠ¸ì¸ì§€ í™•ì¸
                     Item attachitem = obj.GetComponent<Item>();
                     if (attachitem != null)
                     {
-                        // Item Å¸ÀÔÀ¸·Î Ä³½ºÆÃ ¼º°ø - ¾ÆÀÌÅÛ ÀåÂø
-                        attachitem.Attach(AttachPoint);
+                        // Item íƒ€ì…ìœ¼ë¡œ ìºìŠ¤íŒ… ì„±ê³µ - ì•„ì´í…œ ì¥ì°©
+                        attachitem.Attach(this);
                         AttachItem = attachitem;
                     }
                 }
                 else
                 {
-                    AttachItem.AttachUse();
+                    AttachItem.AttachUse(obj);
                 }
             }
         }
 
-        if (Input.GetMouseButtonDown(1)) // ¿ìÅ¬¸¯
+        if (Input.GetMouseButtonDown(1)) // ìš°í´ë¦­
         {
             if (AttachItem != null)
             {
-                AttachItem.Detach(); // ÀåÂøµÈ ¾ÆÀÌÅÛ ÇØÁ¦
+                AttachItem.Detach(); // ì¥ì°©ëœ ì•„ì´í…œ í•´ì œ
                 AttachItem = null;
             }
         }
     }
+
+    void WorldSpaceUiClick(RaycastHit _Hit)
+    {
+        // 1. UI í´ë¦­ ìœ„ì¹˜ë¥¼ í™”ë©´ ì¢Œí‘œë¡œ ë³€í™˜
+        Vector3 screenPos = Cam.WorldToScreenPoint(_Hit.point);
+
+        // 2. UI ì‹œìŠ¤í…œìš© í¬ì¸í„° ì´ë²¤íŠ¸ ìƒì„±
+        PointerEventData pointerData = new PointerEventData(EventSystem.current);
+        pointerData.position = screenPos;
+
+        // 3. UI ì „ìš© ë ˆì´ìºìŠ¤íŠ¸
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        // 4. í´ë¦­ ì²˜ë¦¬
+        foreach (var result in results)
+        {
+            ExecuteEvents.Execute(result.gameObject, pointerData, ExecuteEvents.pointerClickHandler);
+        }
+    }
+
+    public void AddMoney(int _Money)
+    {
+        Money += _Money;
+        Ui_MoneyText.RefreshMoenyText(Money);
+    }
+
+    public GameObject GetAttachPoint() { return AttachPoint; }
 }

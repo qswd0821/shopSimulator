@@ -1,10 +1,13 @@
 using NUnit.Framework.Constraints;
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
 public abstract class Item : MonoBehaviour
 {
-    string ItemName;
-    string SpriteName;
+    protected string ItemName;
+    protected string SpriteName;
+    protected Player Owner;
+
     Vector3 OrgPos;
     Quaternion OrgRot;
 
@@ -13,11 +16,12 @@ public abstract class Item : MonoBehaviour
         OrgPos = transform.position;
         OrgRot = transform.rotation;
     }
-    public abstract void AttachUse();
-    public void Attach(GameObject _ParentObj) // ÀåÂø
+    public abstract void AttachUse(GameObject _Hitobj);
+    public void Attach(Player _Owner) // ÀåÂø
     {
         Debug.Log("attach");
-        transform.SetParent(_ParentObj.transform, false);
+        Owner = _Owner;
+        transform.SetParent(Owner.GetAttachPoint().transform, false);
         transform.localPosition = new Vector3(0,0,0);
     }
 
@@ -27,5 +31,7 @@ public abstract class Item : MonoBehaviour
         transform.SetParent(null, true);
         transform.position = OrgPos;
         transform.rotation = OrgRot;
+
+        Owner = null;
     }
 }
