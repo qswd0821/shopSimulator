@@ -6,9 +6,10 @@ namespace Customer
     public class CustomerStateMachine : MonoBehaviour
     {
         public ICustomerState CurrentState { get; private set; }
-        private ICustomerState _pendingNext; // 같은 프레임 중복 전환 방지
 
+        private ICustomerState _pendingNext; // 같은 프레임 중복 전환 방지
         private Customer _owner;
+        private string _currentState;
 
         private void Awake()
         {
@@ -17,28 +18,26 @@ namespace Customer
 
         private void Start()
         {
-            // Customer 정보 초기 세팅
-            SafeEnter(new CustomerEnteringState());
+            // 손님 정보 초기 세팅 후 진입
+            ChangeState(new CustomerEnteringState());
         }
 
-        private void SetInitialState(ICustomerState initialState)
+        private void Update()
         {
-            if (CurrentState != null)
-            {
-                Debug.LogWarning("Initial state already set. Ignoring.");
-                return;
-            }
-
-            CurrentState = initialState ?? throw new ArgumentNullException(nameof(initialState));
-            SafeEnter(CurrentState);
+#if UNITY_EDITOR
+            _currentState = CurrentState?.GetType().Name ?? "null";
+#endif
         }
+
+        #region StateMachine
 
         // 중첩 전환은 한 프레임에 1회로 제한.
-        public void ChangeState(ICustomerState next)
+        private void ChangeState(ICustomerState next)
         {
             if (next == null)
             {
-                Debug.LogWarning("ChangeState called with null. Ignored.");
+                Debug.Log($"{name}: EOL");
+                _owner.gameObject.SetActive(false);
                 return;
             }
 
@@ -83,7 +82,7 @@ namespace Customer
         {
             try
             {
-                state.OnEnter(_owner);
+                state.OnEnter(_owner, ChangeState);
             }
             catch (Exception e)
             {
@@ -102,5 +101,7 @@ namespace Customer
                 Debug.LogException(e);
             }
         }
+
+        #endregion StateMachine
     }
 }

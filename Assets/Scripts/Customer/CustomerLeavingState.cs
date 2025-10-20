@@ -1,18 +1,34 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Customer
 {
     public class CustomerLeavingState : ICustomerState
     {
-        public void OnEnter(Customer customer)
+        private Customer _customer;
+        private Action<ICustomerState> _stateCallback;
+
+        public void OnEnter(Customer customer, Action<ICustomerState> callback)
         {
-            // 줄 서기
-            throw new System.NotImplementedException();
+            _customer = customer;
+            _stateCallback = callback;
+            // Go Out
+            Act();
         }
-        
+
+        private void Act()
+        {
+            _customer.Movement.MoveTo(_customer.exitPosition, OnArrived);
+            return;
+
+            void OnArrived(bool obj)
+            {
+                _stateCallback.Invoke(new CustomerCheckingState());
+            }
+        }
+
         public void OnExit()
         {
-            throw new System.NotImplementedException();
         }
     }
 }

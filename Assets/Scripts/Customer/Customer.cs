@@ -2,23 +2,27 @@
 
 namespace Customer
 {
-    enum CustomerState
-    {
-        Waiting,
-        Shopping,
-        Checking,
-        Leaving,
-    }
-
     public class Customer : MonoBehaviour
     {
-        public CustomerStateMachine StateMachine { get; private set; }
         public CustomerMovement Movement { get; private set; }
+
+        public Vector3 startPosition;
+        public Vector3 exitPosition;
+        public Vector3 entrancePosition;
+        public GameObject[] shelves;
+        public GameObject checkout;
 
         private void Awake()
         {
-            StateMachine = GetComponent<CustomerStateMachine>();
             Movement = GetComponent<CustomerMovement>();
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(startPosition, Vector3.one * .5f);
+            Gizmos.DrawWireCube(exitPosition, Vector3.one * .5f);
+            Gizmos.DrawWireCube(entrancePosition, Vector3.one * .5f);
         }
     }
 }
