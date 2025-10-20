@@ -9,10 +9,8 @@ public class Scanner : Item
         // Item 스크립트를 가진 오브젝트인지 확인
         Product products = _Hitobj.GetComponent<Product>();
         if (products != null)
-        {
-            Debug.Log("Products");
-
-            Owner.AddMoney(products.GetPirce());
+        { 
+            Shared.UiManager.Pos.AddProductCategory(products);
         }
     }
 }

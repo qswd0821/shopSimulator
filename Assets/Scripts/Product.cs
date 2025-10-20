@@ -2,18 +2,31 @@ using UnityEngine;
 
 public class Product : MonoBehaviour
 {
-    string ItemName;
+    string ProductName;
     string SpriteName;
     int Price;
+    int Id;
 
     private void Start()
     {
+        ProductName = GenerateRandomString(5);
         Price = Random.Range(1000, 10000);
     }
 
-    public void SetItemName(string _ItemName) {  ItemName = _ItemName; }
+    public void SetProductName(string _ProductName) { ProductName = _ProductName; }
     public void SetSpriteName(string _SpriteName) { SpriteName = _SpriteName; }
-    public string GetItemName() { return ItemName; }
+    public string GetProductName() { return ProductName; }
     public string GetSpriteName() { return SpriteName; }
-    public int GetPirce() { return Price; }
+    public int GetPrice() { return Price; }
+    string GenerateRandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        char[] result = new char[length];
+        System.Random random = new System.Random();
+
+        for (int i = 0; i < length; i++)
+            result[i] = chars[random.Next(chars.Length)];
+
+        return new string(result);
+    }
 }
