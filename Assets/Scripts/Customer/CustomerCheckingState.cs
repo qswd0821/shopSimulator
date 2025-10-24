@@ -23,13 +23,25 @@ namespace Customer
 
         private IEnumerator Main()
         {
-            yield return null;
-            // Wait checkout line..
-            // if WaitTime < 2 min Interact with calculator
-            // else ChangeState(CustomerLeavingState) < RUN
+            float waitStartTime = Time.time;
 
-            // Pay
+            // Move to Line (현재 임시 CHECKOUT)
+            _customer.Movement.MoveTo(_customer.checkout.transform.position);
 
+            // CHECKOUT 줄서기
+            while (true)
+            {
+                // 너무 오래 기다리는 경우 도주
+                if (Time.time - waitStartTime > 2)
+                {
+                    _stateCallback.Invoke(new CustomerLeavingState());
+                    break;
+                }
+
+                yield return null;
+            }
+
+            // 이외 Pay
             _stateCallback.Invoke(new CustomerLeavingState());
         }
 

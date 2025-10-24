@@ -23,7 +23,7 @@ namespace Customer
 
             void OnArrived(bool obj)
             {
-                _stateCallback.Invoke(new CustomerCheckingState());
+                _customer.gameObject.SetActive(false);
             }
         }
 

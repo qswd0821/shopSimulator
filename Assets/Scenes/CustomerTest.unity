@@ -1470,8 +1470,6 @@ MonoBehaviour:
   startPosition: {x: -15, y: 0, z: -12}
   exitPosition: {x: -15, y: 0, z: 12}
   entrancePosition: {x: -10, y: 0, z: 0}
-  shelves:
-  - {fileID: 0}
   checkout: {fileID: 828527639}
 --- !u!114 &1957015449
 MonoBehaviour:
@@ -1480,7 +1478,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1957015440}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9c95fb6c1b6420ca664bf8e29449d26, type: 3}
   m_Name: 
