@@ -22,21 +22,13 @@ public class Shelf : MonoBehaviour
         }
     }
 
-    // TODO: Merge 후 Tag가 아닌 ProductID로 변경
     public bool HasProduct(string productId)
     {
-        if (_products.Count > 0 &&
-        _products.Peek().tag == productId)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        // TODO: Tag 사용 취소
+        return _products.Count > 0 && _products.Peek().CompareTag(productId);
     }
 
-    public bool TryGetProduct(out GameObject product)
+    public bool GetProduct(out GameObject product)
     {
         product = null;
         if (_products.Count == 0)
@@ -50,13 +42,21 @@ public class Shelf : MonoBehaviour
 
     public bool TryAddProduct(GameObject product)
     {
+        if (product == null)
+        {
+            Debug.LogError("Product is null");
+            return false;
+        }
+
+        // 꽉 찬 경우
         if (_products.Count >= _capacity)
         {
             return false;
         }
 
-        // TODO: tag 대신 ID
-        if (_products.Count > 0 && _currentProductID != product.tag)
+        // 이미 전시된 아이템과 동일하지 않은 경우
+        // TODO: Tag 사용 취소
+        if (_products.Count > 0 && !product.CompareTag(_currentProductID))
         {
             return false;
         }
@@ -74,5 +74,4 @@ public class Shelf : MonoBehaviour
 
     private Vector3 GetProductPosition(int index)
         => transform.position + productPositions[index];
-
 }

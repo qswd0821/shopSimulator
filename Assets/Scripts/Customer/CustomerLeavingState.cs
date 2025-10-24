@@ -12,19 +12,12 @@ namespace Customer
         {
             _customer = customer;
             _stateCallback = callback;
-            // Go Out
-            Act();
-        }
 
-        private void Act()
-        {
-            _customer.Movement.MoveTo(_customer.exitPosition, OnArrived);
-            return;
-
-            void OnArrived(bool obj)
+            _customer.Movement.MoveTo(_customer.exitPosition, b =>
             {
+                // end of life
                 _customer.gameObject.SetActive(false);
-            }
+            });
         }
 
         public void OnExit()

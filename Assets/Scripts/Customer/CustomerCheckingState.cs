@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace Customer
 {
+    /// <summary>
+    /// 계산대에 줄 선 다음 대기하는 State
+    /// 대기한 시간에 따라 도주하거나 결제를 수행
+    /// </summary>
     public class CustomerCheckingState : ICustomerState
     {
         private Customer _customer;
@@ -12,9 +16,6 @@ namespace Customer
 
         public void OnEnter(Customer customer, Action<ICustomerState> callback)
         {
-            // 줄 서기 + 대기(콜백)
-            // 계산대와 Interact
-            // ChangeState(CustomerLeavingState)
             _customer = customer;
             _stateCallback = callback;
 
@@ -24,16 +25,14 @@ namespace Customer
         private IEnumerator Main()
         {
             float waitStartTime = Time.time;
+            yield return MoveToLine();
 
-            // Move to Line (현재 임시 CHECKOUT)
-            _customer.Movement.MoveTo(_customer.checkout.transform.position);
-
-            // CHECKOUT 줄서기
+            // 체크아웃 줄 대기
             while (true)
             {
-                // 너무 오래 기다리는 경우 도주
-                if (Time.time - waitStartTime > 2)
+                if (Time.time - waitStartTime > _customer.patientTime)
                 {
+                    // 대기 시간이 긴 경우 도주
                     _stateCallback.Invoke(new CustomerLeavingState());
                     break;
                 }
@@ -41,8 +40,31 @@ namespace Customer
                 yield return null;
             }
 
-            // 이외 Pay
+            yield return Pay();
             _stateCallback.Invoke(new CustomerLeavingState());
+        }
+
+        private IEnumerator MoveToLine()
+        {
+            // 줄 서는 로직 구현 필요 (임시로 CHECKOUT까지 이동)
+            bool moveCompleted = false;
+            _customer.Movement.MoveTo(_customer.checkout.transform.position, (succeed) =>
+            {
+                moveCompleted = true;
+                if (!succeed)
+                {
+                    Debug.LogWarning($"{_customer.name}: Failed to move to checkout");
+                    _stateCallback?.Invoke(new CustomerLeavingState());
+                }
+            });
+            yield return new WaitUntil(() => moveCompleted);
+        }
+
+        private IEnumerator Pay()
+        {
+            // 물건 나열 -> 계산 대기 및 지불 -> 물건 SetActive(false) 후 종료 
+
+            return null;
         }
 
         public void OnExit()

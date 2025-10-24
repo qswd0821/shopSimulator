@@ -7,11 +7,20 @@ namespace Customer
     {
         public CustomerMovement Movement { get; private set; }
 
+        // Customer Setup
+        public GameObject customerPrefab;
+        public AnimatorOverrideController animatorOverrideController;
+
+        public float patientTime;
+        public List<GameObject> wishList = new();
+        public List<GameObject> inventory = new();
+
+        // Environment
+        public readonly Queue<Shelf> Shelves = new();
+        public GameObject checkout;
         public Vector3 startPosition;
         public Vector3 exitPosition;
         public Vector3 entrancePosition;
-        public readonly Queue<Shelf> Shelves = new();
-        public GameObject checkout;
 
         private void Awake()
         {

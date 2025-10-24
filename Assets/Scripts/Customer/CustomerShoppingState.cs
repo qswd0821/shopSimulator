@@ -1,24 +1,18 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Customer
 {
-    // 매장 내 탐색 및 물건 픽업
+    /// <summary>
+    /// 매장 내에서 위시리스트에 맞춰서 쇼핑을 진행하는 상태.
+    /// 물건이 다 채워질 때까지 선반을 둘러보며 다 찾은 경우 상태 전이.
+    /// </summary>
     public class CustomerShoppingState : ICustomerState
     {
         private Customer _customer;
         private Coroutine _coroutine;
         private Action<ICustomerState> _stateCallback;
-
-        private class ShoppingYieldInstruction : CustomYieldInstruction
-        {
-            private bool _isDone;
-            public override bool keepWaiting => !_isDone;
-            public void Complete() => _isDone = true;
-        }
 
         public void OnEnter(Customer customer, Action<ICustomerState> callback)
         {
@@ -38,64 +32,67 @@ namespace Customer
 
         private IEnumerator MainLoop()
         {
-            bool isFinished = false;
-            while (!isFinished && _customer.Shelves.Count > 0)
+            while (_customer.Shelves.Count > 0)
             {
                 var shelf = _customer.Shelves.Dequeue();
 
-                // 선반으로 이동할 때까지 대기
+                // 선반까지 이동이 완료될 때까지 대기
                 yield return MoveToShelf(shelf.transform.position);
 
-                // 아이템 픽업할 때까지 대기
-                yield return PickUpProduct(shelf.gameObject, null);
-                isFinished = IsShoppingComplete();
+                // 상품 픽업 동작 완료할 때까지 대기
+                yield return PickUpProduct(shelf);
+
+                if (IsShoppingComplete()) break;
             }
 
-            if (isFinished)
+            if (IsShoppingComplete())
             {
                 _stateCallback.Invoke(new CustomerCheckingState());
             }
             else
             {
-                // 손님이 원하는 아이템이 매장에 없을 수 있는가? 이 때 행동은 어떡할 것인가
+                // 원하는 아이템이 매장에 없는 경우가 있다면
                 // 1. 물건을 다시 원상복구 한 뒤 퇴장
-                // 2. 도둑질 (현재)
-                // 3. 가지고 있는 것만 결제
-                _stateCallback.Invoke(new CustomerLeavingState());
+                // 2. 도둑질
+                // 3. 가지고 있는 것만 결제(현재)
+                _stateCallback.Invoke(new CustomerCheckingState());
             }
         }
 
         private bool IsShoppingComplete()
-        {
-            // 가지고 있는 아이템 비교
-            return true;
-        }
+            => _customer.wishList.Count == 0;
 
-        private ShoppingYieldInstruction MoveToShelf(Vector3 position)
+
+        private IEnumerator MoveToShelf(Vector3 position)
         {
-            ShoppingYieldInstruction yieldInstruction = new ShoppingYieldInstruction();
+            bool moveComplete = false;
             _customer.Movement.MoveTo(position, result =>
             {
+                moveComplete = true;
+
                 if (!result)
                 {
                     Debug.LogWarning($"{_customer.name}: Failed to move to shelf");
+                    _stateCallback?.Invoke(new CustomerLeavingState());
                 }
-
-                yieldInstruction.Complete();
             });
 
-            return yieldInstruction;
+            return new WaitUntil(() => moveComplete);
         }
 
-        private ShoppingYieldInstruction PickUpProduct(GameObject shelf, params GameObject[] products)
+        private IEnumerator PickUpProduct(Shelf shelf)
         {
-            // TEMP
-            ShoppingYieldInstruction yieldInstruction = new ShoppingYieldInstruction();
+            foreach (var productData in _customer.wishList)
+            {
+                if (!shelf.HasProduct("id")) continue;
+                if (shelf.GetProduct(out var productObject))
+                {
+                    _customer.inventory.Add(productObject);
+                }
+            }
 
-            // Pickup animation clip's callback
-            yieldInstruction.Complete();
-
-            return yieldInstruction;
+            // TODO: 애니메이션 Trigger(pickup) 기다리기
+            return null;
         }
     }
 }
