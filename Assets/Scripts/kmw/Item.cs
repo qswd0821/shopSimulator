@@ -6,22 +6,37 @@ public abstract class Item : MonoBehaviour
     protected string ItemName;
     protected string SpriteName;
     protected Player Owner;
+    protected int Id;
 
     Vector3 OrgPos;
     Quaternion OrgRot;
+    protected Vector3 AttachOffset;
 
+    [SerializeField]
+    protected bool IsAttachable;
     private void Start()
+    {
+        Init();
+    }
+    public abstract void AttachUse(GameObject _Hitobj);
+    protected virtual void Init()
     {
         OrgPos = transform.position;
         OrgRot = transform.rotation;
+        AttachOffset = Vector3.zero;
+        IsAttachable = true;
     }
-    public abstract void AttachUse(GameObject _Hitobj);
-    public void Attach(Player _Owner) // ¿Â¬¯
+    public bool TryAttach(Player _Owner) // ¿Â¬¯
     {
+        if (IsAttachable == false)
+            return false;
+
         Debug.Log("attach");
         Owner = _Owner;
         transform.SetParent(Owner.GetAttachPoint().transform, false);
-        transform.localPosition = new Vector3(0,0,0);
+        transform.localPosition = AttachOffset;
+
+        return true;
     }
 
     public void Detach() // «ÿ¡¶
@@ -33,4 +48,6 @@ public abstract class Item : MonoBehaviour
 
         Owner = null;
     }
+
+    public int GetId() { return Id; }
 }

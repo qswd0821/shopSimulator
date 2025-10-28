@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     GameObject AttachPoint;
+    [SerializeField]
+    Phone Phone;
 
     float YRotation;
     float XRotation;
@@ -25,6 +27,8 @@ public class Player : MonoBehaviour
     Ui_MoneyText Ui_MoneyText;
     private void Start()
     {
+        Shared.GameManager.Player = this;
+
         Cursor.lockState = CursorLockMode.Locked;   // 마우스 커서를 화면 안에서 고정
         Cursor.visible = false;                     // 마우스 커서를 보이지 않도록 설정
         
@@ -34,15 +38,22 @@ public class Player : MonoBehaviour
     private void Update()
     {
         Ray();
+        KeyInput();
         Rotate();
     }
 
     private void FixedUpdate()
     {
-        
         Move();
     }
 
+    void KeyInput()
+    {
+        if(Input.GetKeyUp(KeyCode.Q))
+        {
+
+        }
+    }
     void Rotate()
     {
         float mouseX = Input.GetAxisRaw("Mouse X") * MouseSpeed * Time.deltaTime;
@@ -95,9 +106,11 @@ public class Player : MonoBehaviour
                     Item attachitem = obj.GetComponent<Item>();
                     if (attachitem != null)
                     {
-                        // Item 타입으로 캐스팅 성공 - 아이템 장착
-                        attachitem.Attach(this);
-                        AttachItem = attachitem;
+                        // Item 타입으로 캐스팅 성공 - 아이템 장착 시도
+                        if(attachitem.TryAttach(this))
+                        {
+                            AttachItem = attachitem;
+                        }
                     }
                 }
                 else

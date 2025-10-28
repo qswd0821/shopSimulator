@@ -1,4 +1,4 @@
-public enum Type
+public enum USE
 {
     None,
     ENUM_END

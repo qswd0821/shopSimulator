@@ -3,7 +3,8 @@ using UnityEngine;
 public class UiManager : MonoBehaviour
 {
     public Pos Pos;
-    private void Start()
+    public Canvas MainCavas;
+    private void Awake()
     {
         Shared.UiManager = this;
     }

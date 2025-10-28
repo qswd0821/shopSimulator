@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Product : MonoBehaviour
 {
@@ -28,5 +30,25 @@ public class Product : MonoBehaviour
             result[i] = chars[random.Next(chars.Length)];
 
         return new string(result);
+    }
+
+    public void MoveTo(Vector3 _pos)
+    {
+        StartCoroutine(IMoveTo(_pos));
+    }
+
+    public IEnumerator IMoveTo(Vector3 _pos)
+    {
+        float t = 0f;
+        Vector3 start = transform.position;
+        float duration = 0.5f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            transform.position = Vector3.Lerp(start, _pos, t);
+            yield return null;
+        }
+        transform.position = _pos;
     }
 }
