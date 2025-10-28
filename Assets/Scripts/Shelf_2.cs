@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 // 선반마다 고유 아이템 세팅 세팅
-public class Shelf : MonoBehaviour
+public class Shelf_2 : MonoBehaviour
 {
     [SerializeField] private Vector3[] productPositions; // Local(Root: Shelf)
 

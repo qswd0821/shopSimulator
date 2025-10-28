@@ -38,12 +38,17 @@ public class ProductBox : Item
             Product newProd = Instantiate(Product, ParentPoint);
             newProd.transform.localPosition = localPos;
             newProd.transform.localRotation = Quaternion.identity;
-            newProd.transform.localScale = new Vector3(15f / 50.0f, 15f / 35.0f, 15f / 50.0f);
+            newProd.transform.localScale = new Vector3(15f / transform.localScale.x, 
+                15f / transform.localScale.y, 
+                15f / transform.localScale.z);
             QueProduct.Enqueue(newProd);
         }
     }
     public override void AttachUse(GameObject _Hitobj)
     {
+        if (Count <= 0)
+            return;
+
         Count--;
 
         Shelf shelf = _Hitobj.GetComponent<Shelf>();

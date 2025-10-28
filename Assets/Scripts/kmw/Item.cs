@@ -11,6 +11,7 @@ public abstract class Item : MonoBehaviour
     Vector3 OrgPos;
     Quaternion OrgRot;
     protected Vector3 AttachOffset;
+    protected Quaternion AttachRotation;
 
     [SerializeField]
     protected bool IsAttachable;
@@ -24,6 +25,7 @@ public abstract class Item : MonoBehaviour
         OrgPos = transform.position;
         OrgRot = transform.rotation;
         AttachOffset = Vector3.zero;
+        AttachRotation = Quaternion.identity;
         IsAttachable = true;
     }
     public bool TryAttach(Player _Owner) // ÀåÂø
@@ -35,6 +37,7 @@ public abstract class Item : MonoBehaviour
         Owner = _Owner;
         transform.SetParent(Owner.GetAttachPoint().transform, false);
         transform.localPosition = AttachOffset;
+        transform.localRotation = AttachRotation;
 
         return true;
     }

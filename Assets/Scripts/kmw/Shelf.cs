@@ -1,15 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 // 진열대
 public class Shelf : Item
 {
     [SerializeField]
-    Queue<Product> ListProduct = new Queue<Product>();
+    Queue<Product> QueProduct = new Queue<Product>();
 
     [SerializeField]
     Transform BasePoint;
 
+    [SerializeField]
+    Product Product;
+
+    public bool PreGenerated;
+    public int Count;
     public int Row;
     public int Col;
     public float Xspacing = 30f;
@@ -19,8 +25,26 @@ public class Shelf : Item
         base.Init();
         IsAttachable = false;
         Id = 15;
-    }
 
+        // 사전 생성
+        if(PreGenerated)
+        {
+            DoPreGenerated();
+        }
+    }
+    void DoPreGenerated()
+    {
+        for(int i = 0; i < Count;++i)
+        {
+            Product product = Instantiate(Product);
+            product.transform.localPosition = GetSlotPosition(i);
+            product.transform.SetParent(BasePoint, true);
+            product.transform.localRotation = Quaternion.identity;
+            product.transform.localScale = Vector3.one;
+
+            QueProduct.Enqueue(product);
+        }
+    }
     public override void AttachUse(GameObject _Hitobj)
     {
         return;
@@ -37,18 +61,19 @@ public class Shelf : Item
 
         _product.transform.SetParent(BasePoint, true);
         _product.transform.localRotation = Quaternion.identity;
-        _product.transform.localScale = new Vector3(15f / transform.localScale.x, 
-            15f / transform.localScale.y, 
-            15f / transform.localScale.z);
+        //_product.transform.localScale = new Vector3(15f / transform.localScale.x, 
+        //    15f / transform.localScale.y, 
+        //    15f / transform.localScale.z);
+        _product.transform.localScale = Vector3.one;
 
-        ListProduct.Enqueue(_product);
+        QueProduct.Enqueue(_product);
     }
 
-    public int GetCount() { return ListProduct.Count; }
-    public Vector3 GetSlotPosition(int index)
+    public int GetCount() { return QueProduct.Count; }
+    public Vector3 GetSlotPosition(int _index)
     {
-        int r = index / Col;
-        int c = index % Col;
+        int r = _index / Col;
+        int c = _index % Col;
         return BasePoint.position + new Vector3(c * Xspacing, 0.0f, -r * Yspacing);
     }
 }

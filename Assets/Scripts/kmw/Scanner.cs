@@ -2,6 +2,11 @@ using UnityEngine;
 
 public class Scanner : Item
 {
+    protected override void Init()
+    {
+        base.Init();
+        AttachOffset = new Vector3(-14.5f, 15.6f, 9.1f);
+    }
     public override void AttachUse(GameObject _Hitobj)
     {
         Debug.Log("attachUse");
