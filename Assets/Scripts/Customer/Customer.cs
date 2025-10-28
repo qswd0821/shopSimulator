@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Customer
 {
+    /// <summary>
+    /// Customer의 가장 최상위 클래스
+    /// </summary>
     public class Customer : MonoBehaviour
     {
         public CustomerMovement Movement { get; private set; }
-
-        // Customer Setup
-        public GameObject customerPrefab;
-        public AnimatorOverrideController animatorOverrideController;
 
         public float patientTime;
         public List<GameObject> wishList = new();
@@ -21,6 +21,7 @@ namespace Customer
         public Vector3 startPosition;
         public Vector3 exitPosition;
         public Vector3 entrancePosition;
+        public Vector3 coffeeMachinePosition;
 
         private void Awake()
         {

@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Customer
 {
     /// <summary>
-    /// 계산대에 줄 선 다음 대기하는 State
-    /// 대기한 시간에 따라 도주하거나 결제를 수행
+    /// Shopping에서 전이
+    /// 물건을 다 고른 후 계산대 줄에 선 다음 계산까지 처리하는 State
     /// </summary>
     public class CustomerCheckingState : ICustomerState
     {

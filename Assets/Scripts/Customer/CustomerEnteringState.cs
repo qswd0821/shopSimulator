@@ -3,7 +3,8 @@
 namespace Customer
 {
     /// <summary>
-    /// NPC 생성 후 출입문으로 진입하는 상태
+    /// Customer 초기 State
+    /// 생성 후 후 출입문으로 진입하는 State
     /// </summary>
     public class CustomerEnteringState : ICustomerState
     {
