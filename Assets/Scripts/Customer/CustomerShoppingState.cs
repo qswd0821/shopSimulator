@@ -80,7 +80,7 @@ namespace Customer
             return new WaitUntil(() => moveComplete);
         }
 
-        private IEnumerator PickUpProduct(Shelf shelf)
+        private IEnumerator PickUpProduct(Shelf_2 shelf)
         {
             foreach (var productData in _customer.wishList)
             {
