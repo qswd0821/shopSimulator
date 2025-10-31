@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 namespace Customer
 {
@@ -59,9 +60,15 @@ namespace Customer
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(startPosition, Vector3.one * 15f);
-            Gizmos.DrawWireCube(exitPosition, Vector3.one * 15f);
-            Gizmos.DrawWireCube(entrancePosition, Vector3.one * 15f);
+            Gizmos.DrawWireCube(startPosition, Vector3.one * 1.5f);
+            Gizmos.DrawWireCube(exitPosition, Vector3.one * 1.5f);
+            Gizmos.DrawWireCube(entrancePosition, Vector3.one * 1.5f);
+            Gizmos.DrawWireCube(checkout.transform.position, Vector3.one * 1.5f);
+
+            foreach (var shelf in Shelves)
+            {
+                Gizmos.DrawWireCube(shelf.transform.position, Vector3.one * 1.5f);
+            }
         }
     }
 }

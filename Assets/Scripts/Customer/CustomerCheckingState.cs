@@ -28,19 +28,11 @@ namespace Customer
             yield return MoveToLine();
 
             // 체크아웃 줄 대기
-            while (true)
-            {
-                if (Time.time - waitStartTime > _customer.patientTime)
-                {
-                    // 대기 시간이 긴 경우 도주
-                    _stateCallback.Invoke(new CustomerLeavingState());
-                    break;
-                }
-
-                yield return null;
-            }
+            yield return WaitLine();
 
             yield return Pay();
+
+            // 퇴장
             _stateCallback.Invoke(new CustomerLeavingState());
         }
 
@@ -59,6 +51,12 @@ namespace Customer
             });
             yield return new WaitUntil(() => moveCompleted);
         }
+
+        private IEnumerator WaitLine()
+        {
+            yield return null;
+        }
+
 
         private IEnumerator Pay()
         {

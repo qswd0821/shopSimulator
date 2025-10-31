@@ -22,7 +22,7 @@ namespace Customer
                 _customer.Movement.MoveTo(_customer.exitPosition, b =>
                 {
                     // end of life
-                    _customer.gameObject.SetActive(false);
+                    _stateCallback.Invoke(null);
                 });
             });
         }
