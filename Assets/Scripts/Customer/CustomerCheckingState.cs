@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Customer
 {
@@ -22,12 +24,21 @@ namespace Customer
             _coroutine = _customer.StartCoroutine(Main());
         }
 
+        public void OnExit()
+        {
+            if (_coroutine != null)
+            {
+                _customer.StopCoroutine(_coroutine);
+                _coroutine = null;
+            }
+        }
+
         private IEnumerator Main()
         {
             float waitStartTime = Time.time;
             yield return MoveToLine();
 
-            // 체크아웃 줄 대기
+            // 줄 서는 로직 구현 필요
             yield return WaitLine();
 
             yield return Pay();
@@ -38,7 +49,6 @@ namespace Customer
 
         private IEnumerator MoveToLine()
         {
-            // 줄 서는 로직 구현 필요 (임시로 CHECKOUT까지 이동)
             bool moveCompleted = false;
             _customer.Movement.MoveTo(_customer.checkout.transform.position, (succeed) =>
             {
@@ -60,17 +70,25 @@ namespace Customer
 
         private IEnumerator Pay()
         {
-            // 물건 나열 -> 계산 대기 및 지불 -> 물건 SetActive(false) 후 종료 
-
-            return null;
-        }
-
-        public void OnExit()
-        {
-            if (_coroutine != null)
+            // 물건 나열 -> 계산 대기 및 지불 -> 물건 SetActive(false) 후 종료
+            foreach (var product in _customer.Inventory)
             {
-                _customer.StopCoroutine(_coroutine);
+                product.gameObject.SetActive(true);
+                // product.transform.position = dropPosition
             }
+
+            // 계산 대기
+            // ShowCustomerPaymentDialog()
+            // yield return new WaitUntil(() => isPaid);
+
+            // 돈 지급
+            foreach (var product in _customer.Inventory)
+            {
+                Object.Destroy(product.gameObject);
+            }
+
+            _customer.Inventory.Clear();
+            yield return null;
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Customer
             if (next == null || CurrentState?.GetType() == next?.GetType())
             {
                 Debug.Log($"{gameObject.name}: next State is null, Disable");
-                _owner.gameObject.SetActive(false);
+                Clear();
                 return;
             }
 
@@ -43,6 +43,21 @@ namespace Customer
 
             CurrentState = next;
             next.OnEnter(_owner, ChangeState);
+        }
+
+        private void Clear()
+        {
+            if (_owner.Inventory.Count != 0)
+            {
+                // 도둑질한 경우
+                foreach (var product in _owner.Inventory)
+                {
+                    Destroy(product.gameObject);
+                    return;
+                }
+            }
+
+            _owner.gameObject.SetActive(false);
         }
     }
 }

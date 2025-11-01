@@ -506,38 +506,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6485930905510001961, guid: 4747fee382043d743a40fca5d0dc5cd9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1198413236}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6033069631173927286, guid: 4747fee382043d743a40fca5d0dc5cd9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5228605750997912356}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4747fee382043d743a40fca5d0dc5cd9, type: 3}
---- !u!1 &5228605750997912354 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6033069631173927286, guid: 4747fee382043d743a40fca5d0dc5cd9, type: 3}
-  m_PrefabInstance: {fileID: 5228605750997912353}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5228605750997912355 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6485930905510001961, guid: 4747fee382043d743a40fca5d0dc5cd9, type: 3}
   m_PrefabInstance: {fileID: 5228605750997912353}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5228605750997912356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5228605750997912354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6783b771cd50b949b5afb6692f32abd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speedParam: Speed
-  isMovingParam: IsMoving
-  turnParam: Turn
-  speedSmoothTime: 0.15
-  turnSmoothTime: 0.1
 --- !u!1001 &7018428739499163853
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -590,7 +565,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8178585395774893422, guid: aecee98f2a8ee56458c2573e2f3c65d3, type: 3}
+    - {fileID: 275321612017926089, guid: aecee98f2a8ee56458c2573e2f3c65d3, type: 3}
+    - {fileID: 2394277878220448123, guid: aecee98f2a8ee56458c2573e2f3c65d3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

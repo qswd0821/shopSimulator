@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Customer
@@ -19,7 +20,7 @@ namespace Customer
             _customer = customer;
             _stateCallback = callback;
 
-            _coroutine = _customer.StartCoroutine(MainLoop());
+            _coroutine = _customer.StartCoroutine(Main());
         }
 
         public void OnExit()
@@ -30,16 +31,16 @@ namespace Customer
             }
         }
 
-        private IEnumerator MainLoop()
+        private IEnumerator Main()
         {
             while (_customer.Shelves.Count > 0)
             {
                 var shelf = _customer.Shelves.Dequeue();
 
-                // 선반까지 이동이 완료될 때까지 대기
+                // 선반까지 이동할 때까지 대기
                 yield return MoveToShelf(shelf.transform.position);
 
-                // 상품 픽업 동작 완료할 때까지 대기
+                // 상품 픽업 애니메이션이 끝날 때까지 대기
                 yield return PickUpProduct(shelf);
 
                 if (IsShoppingComplete()) break;
@@ -51,16 +52,13 @@ namespace Customer
             }
             else
             {
-                // 원하는 아이템이 매장에 없는 경우가 있다면
-                // 1. 물건을 다시 원상복구 한 뒤 퇴장
-                // 2. 도둑질
-                // 3. 가지고 있는 것만 결제(현재)
-                _stateCallback.Invoke(new CustomerCheckingState());
+                // 물건을 다 구매하지 못한 경우 도둑질 (안 잡으면 손해)
+                _stateCallback.Invoke(new CustomerLeavingState());
             }
         }
 
         private bool IsShoppingComplete()
-            => _customer.wishList.Count == 0;
+            => _customer.Wishlist.Count == 0;
 
 
         private IEnumerator MoveToShelf(Vector3 position)
@@ -80,19 +78,40 @@ namespace Customer
             return new WaitUntil(() => moveComplete);
         }
 
-        private IEnumerator PickUpProduct(Shelf_2 shelf)
+        private IEnumerator PickUpProduct(Shelf shelf)
         {
-            foreach (var productData in _customer.wishList)
+            var pickedProducts = new List<Product>();
+            for (int i = 0; i < _customer.Wishlist.Count; i++)
             {
-                if (!shelf.HasProduct("id")) continue;
-                if (shelf.GetProduct(out var productObject))
-                {
-                    _customer.inventory.Add(productObject);
-                }
+                // if (shelf.HasProduct(_customer.Wishlist[i]))
+                // {
+                //     pickedProducts.Add(shelf.Get());
+                //     break;
+                // }
             }
 
-            // TODO: 애니메이션 Trigger(pickup) 기다리기
-            return null;
+            if (pickedProducts.Count > 0)
+            {
+                foreach (var product in pickedProducts)
+                {
+                    _customer.Wishlist.Remove(product);
+                    _customer.Inventory.Add(product);
+                }
+
+                _customer.Animator.SetTrigger(CustomerAnimator.PickUpTriggerParam);
+                yield return _customer.Animator.WaitForAnimation(CustomerAnimator.PickUpStateName);
+            }
+            // DEBUG
+#if UNITY_EDITOR
+            else
+            {
+                Debug.Log($"No product in shelf({shelf.name}), just execute pickup animation");
+                _customer.Animator.SetTrigger(CustomerAnimator.PickUpTriggerParam);
+                yield return _customer.Animator.WaitForAnimation(CustomerAnimator.PickUpStateName);
+            }
+#endif
+
+            yield return null;
         }
     }
 }
