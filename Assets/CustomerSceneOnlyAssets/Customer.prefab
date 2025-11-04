@@ -1,5 +1,59 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1616557699779224730
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 963195508773227252}
+  - component: {fileID: 3097168719902248187}
+  m_Layer: 0
+  m_Name: Model
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &963195508773227252
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1616557699779224730}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6485930905510001961}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &3097168719902248187
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1616557699779224730}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b21d33fc635f9e243baa160098ce2da0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6033069631173927286
 GameObject:
   m_ObjectHideFlags: 0
@@ -16,6 +70,7 @@ GameObject:
   - component: {fileID: 3067692768470913562}
   - component: {fileID: 2512691469704254641}
   - component: {fileID: 1035820175507805605}
+  - component: {fileID: 6810942115744157285}
   m_Layer: 0
   m_Name: Customer
   m_TagString: Untagged
@@ -35,7 +90,8 @@ Transform:
   m_LocalPosition: {x: -11.495, y: 1, z: -5.426}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 963195508773227252}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8188673647739426335
@@ -125,7 +181,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 3
   avoidancePriority: 50
   m_AngularSpeed: 120
   m_StoppingDistance: 0
@@ -148,15 +204,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6d485dd88034a34a427eb7d087ccd1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  customerPrefab: {fileID: 0}
-  animatorOverrideController: {fileID: 0}
   patientTime: 0
-  wishList: []
-  inventory: []
+  wishlistInitSize: 3
   checkout: {fileID: 0}
-  startPosition: {x: -17.1, y: 0, z: -12}
+  startPosition: {x: -16.8, y: 0, z: -12}
   exitPosition: {x: -15, y: 0, z: 12}
   entrancePosition: {x: -10, y: 0, z: 0}
+  coffeeMachinePosition: {x: 0, y: 0, z: 0}
 --- !u!114 &2512691469704254641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,3 +236,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9c95fb6c1b6420ca664bf8e29449d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6810942115744157285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6033069631173927286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6783b771cd50b949b5afb6692f32abd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speedSmoothTime: 0.15
+  turnSmoothTime: 0.1

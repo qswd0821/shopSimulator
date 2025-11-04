@@ -21,7 +21,9 @@ namespace Customer
         private static readonly int TurnParamHash = Animator.StringToHash(TurnFloatParam);
         private static readonly int IsMovingParamHash = Animator.StringToHash(IsMovingBoolParam);
 
-        [Header("Smoothing")] [SerializeField, Range(0f, 1f)] private float speedSmoothTime = 0.15f;
+        [Header("Smoothing")] [SerializeField, Range(0f, 1f)]
+        private float speedSmoothTime = 0.15f;
+
         [SerializeField, Range(0f, 1f)] private float turnSmoothTime = 0.1f;
 
         private Animator _animator;
@@ -132,7 +134,7 @@ namespace Customer
             {
                 timer += Time.deltaTime;
                 if (timer > timeout) return true;
-                
+
                 var info = _animator.GetCurrentAnimatorStateInfo(layer);
                 return info.IsName(stateName) && info.normalizedTime >= 1f;
             });

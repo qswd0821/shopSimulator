@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Unity.Mathematics;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Customer
@@ -15,7 +15,15 @@ namespace Customer
         public CustomerMovement Movement { get; private set; }
         public CustomerAnimator Animator { get; private set; }
 
-        public readonly List<Product> Wishlist = new(); // 찾을 상품 리스트
+        [Header("Customer")] public GameObject customerModel;
+
+        public AnimatorOverrideController animatorOverrideController;
+        public GameObject customerCanvas;
+        public Text canvasText;
+
+
+        [Header("Wishlist")] public readonly List<Product> Wishlist = new(); // 찾을 상품 리스트
+
         public readonly List<Product> Inventory = new(); // 찾은 상품 리스트
         public float patientTime;
         public float wishlistInitSize;
@@ -24,7 +32,9 @@ namespace Customer
         // Environment
         public readonly Queue<Shelf> Shelves = new();
         public GameObject checkout;
-        public Vector3 startPosition;
+
+        [Header("Position")] public Vector3 startPosition;
+
         public Vector3 exitPosition;
         public Vector3 entrancePosition;
         public Vector3 coffeeMachinePosition;

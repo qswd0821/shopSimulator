@@ -97,3 +97,6 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+.idea/.idea.shopSimulator/.idea/encodings.xml
+.idea/.idea.shopSimulator/.idea/indexLayout.xml
+.idea/.idea.shopSimulator/.idea/vcs.xml

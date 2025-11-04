@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -35,11 +34,25 @@ namespace Customer
 
         private IEnumerator Main()
         {
-            float waitStartTime = Time.time;
-            yield return MoveToLine();
+            // float waitStartTime = Time.time;
+            // yield return MoveToLine();
+            // yield return WaitLine();
 
-            // 줄 서는 로직 구현 필요
-            yield return WaitLine();
+            // 가게에 손님 한 명으로 가정 (추후 줄 세우기)
+            bool moveCompleted = false;
+            _customer.Movement.MoveTo(_customer.checkout.transform.position, b =>
+            {
+                if (b)
+                {
+                    moveCompleted = true;
+                }
+                else
+                {
+                    Debug.LogWarning($"{_customer.name}: Failed to move to checkout");
+                    _stateCallback?.Invoke(new CustomerLeavingState());
+                }
+            });
+            yield return new WaitUntil(() => moveCompleted);
 
             yield return Pay();
 
@@ -78,17 +91,26 @@ namespace Customer
             }
 
             // 계산 대기
-            // ShowCustomerPaymentDialog()
-            // yield return new WaitUntil(() => isPaid);
+            SetCustomerWaitingUI(true);
+            _customer.Animator.SetBool(CustomerAnimator.IsWaitingBoolParam, true);
+            yield return new WaitForSeconds(1); // WaitUntil(() => isPaid);
 
             // 돈 지급
+            _customer.Animator.SetBool(CustomerAnimator.IsWaitingBoolParam, false);
             foreach (var product in _customer.Inventory)
             {
                 Object.Destroy(product.gameObject);
             }
 
             _customer.Inventory.Clear();
+
+            SetCustomerWaitingUI(false);
             yield return null;
+        }
+
+        private void SetCustomerWaitingUI(bool b)
+        {
+            _customer.customerCanvas.SetActive(b);
         }
     }
 }
