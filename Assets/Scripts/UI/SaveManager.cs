@@ -1,69 +1,35 @@
-// Assets/Scripts/Core/SaveManager.cs
-using System.IO;
 using UnityEngine;
-
-[System.Serializable]
-public struct SaveData
-{
-    public int version;
-    public int day;
-    public int money;
-    public int reputation;
-    public int timeOfDay; // 분 (0~1439)
-}
 
 public class SaveManager : MonoBehaviour
 {
-    public const int CURRENT_VERSION = 1;
-    private static string FilePath => Path.Combine(Application.persistentDataPath, "save.json");
-    public SaveData Current { get; private set; }
-
-    public bool HasSave() => File.Exists(FilePath);
-
-    public SaveData LoadOrCreateDefault()
+    /// <summary>
+    /// 메인 메뉴가 "저장 파일이 있는지?" 물어볼 때 호출
+    /// </summary>
+    public bool HasSave()
     {
-        if (!HasSave())
-        {
-            Current = NewDefault();
-            Save(Current);
-            return Current;
-        }
-        var json = File.ReadAllText(FilePath);
-        var data = JsonUtility.FromJson<SaveData>(json);
-        Current = MigrateIfNeeded(data);
-        return Current;
+        // TODO: 나중에 실제 저장 파일(예: PlayerPrefs)이 있는지 확인해야 함
+
+        // 지금은 "저장 파일 없음"으로 가정
+        return false;
     }
 
-    public void Save(SaveData data)
-    {
-        data.version = CURRENT_VERSION;
-        Current = data;
-        var json = JsonUtility.ToJson(Current);
-        File.WriteAllText(FilePath, json);
-#if UNITY_EDITOR
-        Debug.Log($"[SaveManager] Saved: {FilePath}\n{json}");
-#endif
-    }
-
+    /// <summary>
+    /// '새 게임' 버튼을 눌렀을 때 호출
+    /// </summary>
     public void NewGame()
     {
-        Save(NewDefault());
+        // TODO: 나중에 기존 저장 파일을 삭제하는 로직 추가
+
+        Debug.Log("Starting...");
     }
 
-    SaveData NewDefault() => new SaveData
+    /// <summary>
+    /// '이어하기' 버튼을 눌렀을 때 호출
+    /// </summary>
+    public void LoadOrCreateDefault()
     {
-        version = CURRENT_VERSION,
-        day = 1,
-        money = 100000,
-        reputation = 0,
-        timeOfDay = 8 * 60
-    };
+        // TODO: 나중에 실제 저장 파일을 불러오는 로직 추가
 
-    SaveData MigrateIfNeeded(SaveData old)
-    {
-        // 버전업 시 여기에 마이그레이션 로직 추가
-        if (old.version == 0) { old.version = 1; }
-        if (old.version != CURRENT_VERSION) Save(old);
-        return old;
+        Debug.Log("Load Game...");
     }
 }
