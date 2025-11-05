@@ -4,10 +4,10 @@ using System; // C# 이벤트(Action)를 사용하기 위해 필요
 // 게임의 핵심 상태 (예시)
 public enum GameState { Playing, Paused }
 
-public class GameManager : MonoBehaviour
+public class UIManager : MonoBehaviour
 {
-    // 1. 싱글톤(Singleton) 패턴: 씬 어디에서나 GameManager.Instance로 쉽게 접근 가능
-    public static GameManager Instance { get; private set; }
+    // 1. 싱글톤(Singleton) 패턴: 씬 어디에서나 UIManager.Instance로 쉽게 접근 가능
+    public static UIManager Instance { get; private set; }
 
     [Header("핵심 데이터")]
     public int Money; // 현재 소지금
