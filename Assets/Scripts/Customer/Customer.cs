@@ -20,12 +20,17 @@ namespace Customer
         public GameObject customerCanvas;
         public float paymentPatientTime = 15;
 
-        [Header("Wishlist")] public readonly List<Product> Wishlist = new(); // 찾을 상품
-        public readonly List<Product> Inventory = new(); // 찾아서 담은 상품
-        public float wishlistInitSize;
+        public float patientTime;
+        public List<GameObject> wishList = new();
+        public List<Product> inventory = new();
 
-
+        // Environment
         public readonly Queue<Shelf> Shelves = new();
+        public GameObject checkout;
+        public Vector3 startPosition;
+        public Vector3 exitPosition;
+        public Vector3 entrancePosition;
+        public bool IsPayMent;
 
         private void Awake()
         {
@@ -93,6 +98,11 @@ namespace Customer
             {
                 Gizmos.DrawWireCube(shelf.transform.position, Vector3.one * 1.5f);
             }
+        }
+
+        public void OnFinishPayMent()
+        {
+            IsPayMent = true;
         }
     }
 }

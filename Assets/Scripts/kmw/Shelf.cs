@@ -25,6 +25,7 @@ public class Shelf : Item
         base.Init();
         IsAttachable = false;
         Id = 15;
+        Shared.GameManager.ListShelf.Add(this);
 
         // 사전 생성
         if(PreGenerated)
@@ -61,10 +62,10 @@ public class Shelf : Item
 
         _product.transform.SetParent(BasePoint, true);
         _product.transform.localRotation = Quaternion.identity;
-        //_product.transform.localScale = new Vector3(15f / transform.localScale.x, 
-        //    15f / transform.localScale.y, 
-        //    15f / transform.localScale.z);
-        _product.transform.localScale = Vector3.one;
+        _product.transform.localScale = new Vector3(15f / transform.localScale.x, 
+            15f / transform.localScale.y, 
+            15f / transform.localScale.z);
+        //_product.transform.localScale = Vector3.one;
 
         QueProduct.Enqueue(_product);
     }
@@ -75,5 +76,27 @@ public class Shelf : Item
         int r = _index / Col;
         int c = _index % Col;
         return BasePoint.position + new Vector3(c * Xspacing, 0.0f, -r * Yspacing);
+    }
+
+    public Product GetProduct(int _id)
+    {
+        Product _product = QueProduct.Dequeue();
+        if (_product == null || _product.GetId() != _id)
+        {
+            return null;
+        }
+
+        _product.SetBodyActive(false);
+        return _product;
+    }
+
+    public void DeleteAll()
+    {
+        while (QueProduct.Count > 0)
+        {
+            Product product = QueProduct.Dequeue();
+            Destroy(product.gameObject);
+        }
+        QueProduct.Clear();
     }
 }

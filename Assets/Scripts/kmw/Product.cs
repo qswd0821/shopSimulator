@@ -4,15 +4,20 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Product : MonoBehaviour
 {
+    [SerializeField]
+    GameObject Body;
+
     string ProductName;
     string SpriteName;
     int Price;
+    [SerializeField]
     int Id;
 
     private void Start()
     {
         ProductName = GenerateRandomString(5);
         Price = Random.Range(1000, 10000);
+        Id = 15;
     }
 
     public void SetProductName(string _ProductName) { ProductName = _ProductName; }
@@ -20,6 +25,11 @@ public class Product : MonoBehaviour
     public string GetProductName() { return ProductName; }
     public string GetSpriteName() { return SpriteName; }
     public int GetPrice() { return Price; }
+    public int GetId() { return Id; }
+    public void SetBodyActive(bool _value)
+    {
+        Body.SetActive(_value);
+    }
     string GenerateRandomString(int length)
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
