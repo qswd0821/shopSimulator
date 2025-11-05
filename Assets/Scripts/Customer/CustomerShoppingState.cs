@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Customer
@@ -80,19 +81,33 @@ namespace Customer
             return new WaitUntil(() => moveComplete);
         }
 
-        private IEnumerator PickUpProduct(Shelf_2 shelf)
+        private IEnumerator PickUpProduct(Shelf shelf)
         {
-            foreach (var productData in _customer.wishList)
+            //foreach (var productData in _customer.wishList)
+            //{
+                //if (!shelf.HasProduct("id")) continue;
+                //if (shelf.GetProduct(out var productObject))
+                //{
+                //    //_customer.inventory.Add(productObject);
+                //}
+            //}
+
+            //선반에서 id(15)인 물건을 꺼내 인벤토리에 추가
+            Product product = shelf.GetProduct(15);
+            if (product != null)
             {
-                if (!shelf.HasProduct("id")) continue;
-                if (shelf.GetProduct(out var productObject))
-                {
-                    _customer.inventory.Add(productObject);
-                }
+                Debug.Log("add inventory");
+                AddInventory(product);
             }
 
             // TODO: 애니메이션 Trigger(pickup) 기다리기
             return null;
+        }
+
+        private void AddInventory(Product _product)
+        {
+            _product.transform.SetParent(_customer.transform, false);
+            _customer.inventory.Add(_product);
         }
     }
 }

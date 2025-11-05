@@ -13,35 +13,54 @@ namespace Customer
         private Customer _customer;
         private Action<ICustomerState> _stateCallback;
         private Coroutine _coroutine;
+       
 
         public void OnEnter(Customer customer, Action<ICustomerState> callback)
         {
             _customer = customer;
             _stateCallback = callback;
+            _customer.IsPayMent = false;
 
             _coroutine = _customer.StartCoroutine(Main());
+
+            Shared.GameManager.Pos.AddWaitingForPayMentLine(_customer);
         }
 
         private IEnumerator Main()
         {
             float waitStartTime = Time.time;
-            yield return MoveToLine();
 
-            // 체크아웃 줄 대기
             while (true)
             {
-                if (Time.time - waitStartTime > _customer.patientTime)
+                if(_customer.Movement.HasArrivedAtDestination())
                 {
-                    // 대기 시간이 긴 경우 도주
-                    _stateCallback.Invoke(new CustomerLeavingState());
-                    break;
+                    int idx = Shared.GameManager.Pos.GetMyWaitNumber(_customer);
+                    if (idx == 0)
+                    {
+                        yield return Pay();
+                        break;
+                    }
                 }
-
                 yield return null;
             }
-
-            yield return Pay();
             _stateCallback.Invoke(new CustomerLeavingState());
+            //yield return MoveToLine();
+
+            // 체크아웃 줄 대기
+            //while (true)
+            //{
+            //    if (Time.time - waitStartTime > _customer.patientTime)
+            //    {
+            //        // 대기 시간이 긴 경우 도주
+            //        _stateCallback.Invoke(new CustomerLeavingState());
+            //        break;
+            //    }
+            //
+            //    yield return null;
+            //}
+
+            //yield return Pay();
+            //_stateCallback.Invoke(new CustomerLeavingState());
         }
 
         private IEnumerator MoveToLine()
@@ -63,8 +82,18 @@ namespace Customer
         private IEnumerator Pay()
         {
             // 물건 나열 -> 계산 대기 및 지불 -> 물건 SetActive(false) 후 종료 
+            Debug.Log("Pay");
+            while(_customer.inventory.Count != 0)
+            {
+                //물건 나열
+                Product product = _customer.inventory[0];
+                Shared.GameManager.Pos.AddProductToCheckPoint(product);
+                _customer.inventory.RemoveAt(0);
 
-            return null;
+                yield return new WaitForSeconds(0.3f);
+            }
+
+            yield return new WaitUntil(() => _customer.IsPayMent);
         }
 
         public void OnExit()

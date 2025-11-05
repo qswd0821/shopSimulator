@@ -61,7 +61,7 @@ namespace Customer
             }
         }
 
-        private bool HasArrivedAtDestination()
+        public bool HasArrivedAtDestination()
             => _navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance;
 
 

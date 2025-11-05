@@ -13,14 +13,15 @@ namespace Customer
 
         public float patientTime;
         public List<GameObject> wishList = new();
-        public List<GameObject> inventory = new();
+        public List<Product> inventory = new();
 
         // Environment
-        public readonly Queue<Shelf_2> Shelves = new();
+        public readonly Queue<Shelf> Shelves = new();
         public GameObject checkout;
         public Vector3 startPosition;
         public Vector3 exitPosition;
         public Vector3 entrancePosition;
+        public bool IsPayMent;
 
         private void Awake()
         {
@@ -31,10 +32,10 @@ namespace Customer
 
         private void FindShelves()
         {
-            var shelves = FindObjectsByType<Shelf_2>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var shelves = FindObjectsByType<Shelf>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
             // 랜덤한 순서로 섞기
-            var shuffledShelves = new List<Shelf_2>(shelves);
+            var shuffledShelves = new List<Shelf>(shelves);
             for (int i = shuffledShelves.Count - 1; i > 0; i--)
             {
                 int randomIndex = Random.Range(0, i + 1);
@@ -61,6 +62,11 @@ namespace Customer
             Gizmos.DrawWireCube(startPosition, Vector3.one * 15f);
             Gizmos.DrawWireCube(exitPosition, Vector3.one * 15f);
             Gizmos.DrawWireCube(entrancePosition, Vector3.one * 15f);
+        }
+
+        public void OnFinishPayMent()
+        {
+            IsPayMent = true;
         }
     }
 }
