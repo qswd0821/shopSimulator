@@ -52,9 +52,11 @@ public class Pos : MonoBehaviour
         //손님이 없을 경우 결제하지 않음
         if (ListCustomer.Count <= 0) return;
 
-        Debug.Log("OnPayMent");
         Shared.GameManager.Player.AddMoney(TotalNum);
         PosReset();
+
+        // 계산대 위 물건 제거
+        CheckPointShelf.DeleteAll();
 
         // 맨 앞 손님 제거
         Customer.Customer front = ListCustomer[0];

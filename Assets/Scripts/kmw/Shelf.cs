@@ -89,4 +89,14 @@ public class Shelf : Item
         _product.SetBodyActive(false);
         return _product;
     }
+
+    public void DeleteAll()
+    {
+        while (QueProduct.Count > 0)
+        {
+            Product product = QueProduct.Dequeue();
+            Destroy(product.gameObject);
+        }
+        QueProduct.Clear();
+    }
 }
