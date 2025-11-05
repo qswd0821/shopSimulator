@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Customer
+namespace Customer.States
 {
     /// <summary>
     /// Customer 초기 State
@@ -17,8 +17,8 @@ namespace Customer
             _stateCallback = callback;
 
             // 손님 정보 세팅 (모델, 목표 구매 리스트 등)
-            customer.transform.position = _customer.startPosition;
-            customer.Movement.MoveTo(_customer.entrancePosition, OnArrived);
+            customer.transform.position = CustomerManager.Instance.startPosition;
+            customer.Movement.MoveTo(CustomerManager.Instance.entrancePosition, OnArrived);
         }
 
         private void OnArrived(bool succeed)
@@ -37,6 +37,8 @@ namespace Customer
 
         public void OnExit()
         {
+            _customer = null;
+            _stateCallback = null;
         }
     }
 }

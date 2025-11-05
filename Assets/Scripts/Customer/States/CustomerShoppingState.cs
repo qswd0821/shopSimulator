@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Customer
+namespace Customer.States
 {
     /// <summary>
     /// 매장 내에서 위시리스트에 맞춰서 쇼핑을 진행하는 상태.
@@ -28,37 +28,38 @@ namespace Customer
             if (_coroutine != null)
             {
                 _customer.StopCoroutine(_coroutine);
+                _coroutine = null;
             }
+
+            _stateCallback = null;
         }
 
         private IEnumerator Main()
         {
-            while (_customer.Shelves.Count > 0)
+            // 매장에 구매 가능한 상품이 없음
+            if (_customer.Wishlist.Count == 0)
             {
-                var shelf = _customer.Shelves.Dequeue();
-
-                // 선반까지 이동할 때까지 대기
-                yield return MoveToShelf(shelf.transform.position);
-
-                // 상품 픽업 애니메이션이 끝날 때까지 대기
-                yield return PickUpProduct(shelf);
-
-                if (IsShoppingComplete()) break;
+                _stateCallback.Invoke(new CustomerLeavingState());
+                yield break;
             }
 
-            if (IsShoppingComplete())
+            // 매장 내 모든 선반으로 이동 (랜덤)
+            foreach (var shelf in _customer.Shelves)
+            {
+                yield return MoveToShelf(shelf.transform.position);
+                yield return SearchShelfForWishlistItems(shelf);
+            }
+
+            // 물건을 하나라도 집은 경우
+            if (_customer.Inventory.Count > 0)
             {
                 _stateCallback.Invoke(new CustomerCheckingState());
             }
             else
             {
-                // 물건을 다 구매하지 못한 경우 도둑질 (안 잡으면 손해)
                 _stateCallback.Invoke(new CustomerLeavingState());
             }
         }
-
-        private bool IsShoppingComplete()
-            => _customer.Wishlist.Count == 0;
 
 
         private IEnumerator MoveToShelf(Vector3 position)
@@ -78,18 +79,20 @@ namespace Customer
             return new WaitUntil(() => moveComplete);
         }
 
-        private IEnumerator PickUpProduct(Shelf shelf)
+        // TODO: Shelf와 상호작용 필요
+        private IEnumerator SearchShelfForWishlistItems(Shelf shelf)
         {
             var pickedProducts = new List<Product>();
             for (int i = 0; i < _customer.Wishlist.Count; i++)
             {
                 // if (shelf.HasProduct(_customer.Wishlist[i]))
                 // {
-                //     pickedProducts.Add(shelf.Get());
+                //     pickedProducts.Add(shelf.Pop());
                 //     break;
                 // }
             }
 
+            // Wishlist의 아이템이 선반에 있는 경우
             if (pickedProducts.Count > 0)
             {
                 foreach (var product in pickedProducts)
@@ -101,15 +104,13 @@ namespace Customer
                 _customer.Animator.SetTrigger(CustomerAnimator.PickUpTriggerParam);
                 yield return _customer.Animator.WaitForAnimation(CustomerAnimator.PickUpStateName);
             }
-            // DEBUG
-#if UNITY_EDITOR
+            // 아예 없는 경우
             else
             {
-                Debug.Log($"No product in shelf({shelf.name}), just execute pickup animation");
-                _customer.Animator.SetTrigger(CustomerAnimator.PickUpTriggerParam);
-                yield return _customer.Animator.WaitForAnimation(CustomerAnimator.PickUpStateName);
+                // TODO: Wait Animation 설정
+                // _customer.Animator.SetTrigger(CustomerAnimator.PickUpTriggerParam);
+                // yield return _customer.Animator.WaitForAnimation(CustomerAnimator.PickUpStateName);
             }
-#endif
 
             yield return null;
         }

@@ -1,7 +1,6 @@
 ﻿using System;
-using UnityEngine;
 
-namespace Customer
+namespace Customer.States
 {
     /// <summary>
     /// 모든 행동을 마쳤거나 오류가 난 경우 전이하는 최종 State
@@ -17,9 +16,9 @@ namespace Customer
             _customer = customer;
             _stateCallback = callback;
 
-            _customer.Movement.MoveTo(_customer.entrancePosition, b =>
+            _customer.Movement.MoveTo(CustomerManager.Instance.entrancePosition, b =>
             {
-                _customer.Movement.MoveTo(_customer.exitPosition, b =>
+                _customer.Movement.MoveTo(CustomerManager.Instance.exitPosition, b =>
                 {
                     // end of life
                     _stateCallback.Invoke(null);
@@ -29,6 +28,8 @@ namespace Customer
 
         public void OnExit()
         {
+            _customer = null;
+            _stateCallback = null;
         }
     }
 }

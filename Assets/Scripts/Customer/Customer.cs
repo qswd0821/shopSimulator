@@ -14,97 +14,81 @@ namespace Customer
     {
         public CustomerMovement Movement { get; private set; }
         public CustomerAnimator Animator { get; private set; }
+        public CustomerInteractor Interactor { get; private set; }
 
         [Header("Customer")] public GameObject customerModel;
-
-        public AnimatorOverrideController animatorOverrideController;
         public GameObject customerCanvas;
-        public Text canvasText;
+        public float paymentPatientTime = 15;
 
-
-        [Header("Wishlist")] public readonly List<Product> Wishlist = new(); // 찾을 상품 리스트
-
-        public readonly List<Product> Inventory = new(); // 찾은 상품 리스트
-        public float patientTime;
+        [Header("Wishlist")] public readonly List<Product> Wishlist = new(); // 찾을 상품
+        public readonly List<Product> Inventory = new(); // 찾아서 담은 상품
         public float wishlistInitSize;
 
 
-        // Environment
         public readonly Queue<Shelf> Shelves = new();
-        public GameObject checkout;
-
-        [Header("Position")] public Vector3 startPosition;
-
-        public Vector3 exitPosition;
-        public Vector3 entrancePosition;
-        public Vector3 coffeeMachinePosition;
 
         private void Awake()
         {
             Movement = GetComponent<CustomerMovement>();
             Animator = GetComponent<CustomerAnimator>();
-            FindShelves();
-            SetWishlist();
+            Interactor = GetComponent<CustomerInteractor>();
+
             Init();
+        }
+
+        private void Init()
+        {
+            SetWishlist();
+            FindShelves();
+            CustomerManager.Instance.startPosition.y = transform.localPosition.y;
+            CustomerManager.Instance.exitPosition.y = transform.localPosition.y;
+            CustomerManager.Instance.entrancePosition.y = transform.localPosition.y;
+        }
+
+        public void DestroyCustomer()
+        {
+            Wishlist.Clear();
+            foreach (var product in Inventory)
+            {
+                if (product != null)
+                {
+                    product.transform.position = transform.position;
+                    product.gameObject.SetActive(true);
+                }
+            }
+
+            Inventory.Clear();
+            Destroy(gameObject);
         }
 
         private void SetWishlist()
         {
-            // 최소한의 최적화 없이 세팅
-            // 추후 게임 매니저 측에서 하루 시작 시 세팅
-            var productsInGame = FindObjectsByType<Product>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-            if (productsInGame.Length == 0) return;
-
-            var shuffledProducts = new List<Product>(productsInGame);
-            for (var i = shuffledProducts.Count - 1; i > 0; i--)
+            for (var i = 0; i < Mathf.Min(wishlistInitSize, CustomerManager.Instance.AvailableProducts.Count); i++)
             {
-                var randomIndex = Random.Range(0, i + 1);
-                (shuffledProducts[i], shuffledProducts[randomIndex]) =
-                    (shuffledProducts[randomIndex], shuffledProducts[i]);
-            }
-
-            var itemsToAdd = Mathf.Min(shuffledProducts.Count, (int)wishlistInitSize);
-            for (var i = 0; i < itemsToAdd; i++)
-            {
-                Wishlist.Add(shuffledProducts[i]);
+                Wishlist.Add(CustomerManager.Instance.AvailableProducts.Dequeue());
             }
         }
 
         private void FindShelves()
         {
-            var shelves = FindObjectsByType<Shelf>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var foundShelves = FindObjectsByType<Shelf>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
             // 랜덤한 순서로 섞기
-            var shuffledShelves = new List<Shelf>(shelves);
-            for (int i = shuffledShelves.Count - 1; i > 0; i--)
+            for (int i = foundShelves.Length - 1; i > 0; i--)
             {
                 int randomIndex = Random.Range(0, i + 1);
-                (shuffledShelves[i], shuffledShelves[randomIndex]) = (shuffledShelves[randomIndex], shuffledShelves[i]);
+                (foundShelves[i], foundShelves[randomIndex]) = (foundShelves[randomIndex], foundShelves[i]);
             }
 
-            // Queue에 추가
-            foreach (var shelf in shuffledShelves)
+            foreach (var shelf in foundShelves)
             {
                 Shelves.Enqueue(shelf);
             }
         }
 
-        private void Init()
-        {
-            startPosition.y = transform.localPosition.y;
-            exitPosition.y = transform.localPosition.y;
-            entrancePosition.y = transform.localPosition.y;
-        }
-
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(startPosition, Vector3.one * 1.5f);
-            Gizmos.DrawWireCube(exitPosition, Vector3.one * 1.5f);
-            Gizmos.DrawWireCube(entrancePosition, Vector3.one * 1.5f);
-            Gizmos.DrawWireCube(checkout.transform.position, Vector3.one * 1.5f);
-
-            Gizmos.color = Color.blue;
             foreach (var shelf in Shelves)
             {
                 Gizmos.DrawWireCube(shelf.transform.position, Vector3.one * 1.5f);

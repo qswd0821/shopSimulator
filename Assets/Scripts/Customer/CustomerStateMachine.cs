@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Customer.States;
 using UnityEngine;
 
 namespace Customer
@@ -7,12 +7,12 @@ namespace Customer
     {
         public ICustomerState CurrentState { get; private set; }
 
-        private Customer _owner;
+        private Customer _customer;
         private string _currentState;
 
         private void Awake()
         {
-            _owner = GetComponent<Customer>();
+            _customer = GetComponent<Customer>();
         }
 
         private void Start()
@@ -30,8 +30,8 @@ namespace Customer
         {
             if (next == null || CurrentState?.GetType() == next?.GetType())
             {
-                Debug.Log($"{gameObject.name}: next State is null, Disable");
-                Clear();
+                Debug.Log($"{gameObject.name}: End of state");
+                _customer.DestroyCustomer();
                 return;
             }
 
@@ -42,22 +42,7 @@ namespace Customer
             }
 
             CurrentState = next;
-            next.OnEnter(_owner, ChangeState);
-        }
-
-        private void Clear()
-        {
-            if (_owner.Inventory.Count != 0)
-            {
-                // 도둑질한 경우
-                foreach (var product in _owner.Inventory)
-                {
-                    Destroy(product.gameObject);
-                    return;
-                }
-            }
-
-            _owner.gameObject.SetActive(false);
+            next.OnEnter(_customer, ChangeState);
         }
     }
 }

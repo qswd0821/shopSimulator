@@ -8,19 +8,19 @@ namespace Customer
     public class CustomerMovement : MonoBehaviour
     {
         private NavMeshAgent _navMeshAgent;
-        private Action<bool> _arrivedCallback;
+        private Action<bool> _movementCallback;
         [SerializeField] private Vector3 testPosition;
         private float _moveSpeed;
 
         private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
-            _arrivedCallback = null;
+            _movementCallback = null;
         }
 
         public void MoveTo(Vector3 destination, Action<bool> onArrived = null)
         {
-            _arrivedCallback = onArrived;
+            _movementCallback = onArrived;
             bool succeed = _navMeshAgent.SetDestination(destination);
 
             // 목적지 설정 불가능
@@ -44,11 +44,11 @@ namespace Customer
 
         private void CheckCallback()
         {
-            if (_arrivedCallback == null || _navMeshAgent.pathPending) return;
+            if (_movementCallback == null || _navMeshAgent.pathPending) return;
 
             if (HasArrivedAtDestination())
             {
-                // 멈추었을 때만 시행
+                // 멈추었을 때만 콜백 호출
                 bool success = _navMeshAgent.pathStatus == NavMeshPathStatus.PathComplete;
                 if (!_navMeshAgent.hasPath || _navMeshAgent.velocity.sqrMagnitude <= 0.001f)
                 {
@@ -65,23 +65,13 @@ namespace Customer
             => _navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance;
 
 
-        // ReSharper disable Unity.PerformanceAnalysis
         private void InvokeAndReset(bool result)
         {
             _navMeshAgent.ResetPath();
 
-            var callback = _arrivedCallback;
-            _arrivedCallback = null;
+            var callback = _movementCallback;
+            _movementCallback = null;
             callback?.Invoke(result);
-        }
-
-
-        private void OnGUI()
-        {
-            if (GUILayout.Button("Move to"))
-            {
-                MoveTo(testPosition, b => { Debug.Log("Arrived: " + b); });
-            }
         }
     }
 }

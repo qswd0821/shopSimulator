@@ -3,11 +3,10 @@ using System.Collections;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Customer
+namespace Customer.States
 {
     /// <summary>
-    /// Shopping에서 전이
-    /// 물건을 다 고른 후 계산대 줄에 선 다음 계산까지 처리하는 State
+    /// 물건을 1개 이상 고른 경우 계산을 처리하는 State
     /// </summary>
     public class CustomerCheckingState : ICustomerState
     {
@@ -30,29 +29,14 @@ namespace Customer
                 _customer.StopCoroutine(_coroutine);
                 _coroutine = null;
             }
+
+            _customer = null;
+            _stateCallback = null;
         }
 
         private IEnumerator Main()
         {
-            // float waitStartTime = Time.time;
-            // yield return MoveToLine();
-            // yield return WaitLine();
-
-            // 가게에 손님 한 명으로 가정 (추후 줄 세우기)
-            bool moveCompleted = false;
-            _customer.Movement.MoveTo(_customer.checkout.transform.position, b =>
-            {
-                if (b)
-                {
-                    moveCompleted = true;
-                }
-                else
-                {
-                    Debug.LogWarning($"{_customer.name}: Failed to move to checkout");
-                    _stateCallback?.Invoke(new CustomerLeavingState());
-                }
-            });
-            yield return new WaitUntil(() => moveCompleted);
+            yield return MoveToCounter();
 
             yield return Pay();
 
@@ -60,52 +44,68 @@ namespace Customer
             _stateCallback.Invoke(new CustomerLeavingState());
         }
 
-        private IEnumerator MoveToLine()
+        private IEnumerator MoveToCounter()
         {
             bool moveCompleted = false;
-            _customer.Movement.MoveTo(_customer.checkout.transform.position, (succeed) =>
+            _customer.Movement.MoveTo(CustomerManager.Instance.counter.transform.position, b =>
             {
-                moveCompleted = true;
-                if (!succeed)
+                if (!b)
                 {
-                    Debug.LogWarning($"{_customer.name}: Failed to move to checkout");
+                    Debug.LogWarning($"{_customer.name}: Failed to move to counter");
                     _stateCallback?.Invoke(new CustomerLeavingState());
+                    return;
                 }
+
+                moveCompleted = true;
             });
             yield return new WaitUntil(() => moveCompleted);
         }
 
-        private IEnumerator WaitLine()
-        {
-            yield return null;
-        }
-
-
         private IEnumerator Pay()
         {
-            // 물건 나열 -> 계산 대기 및 지불 -> 물건 SetActive(false) 후 종료
+            // 물건 나열 및 가격 계산
+            int totalPrice = 0;
             foreach (var product in _customer.Inventory)
             {
+                product.transform.position = CustomerManager.Instance.counter.transform.position + Vector3.up;
                 product.gameObject.SetActive(true);
-                // product.transform.position = dropPosition
+                totalPrice = product.GetPrice();
             }
 
             // 계산 대기
             SetCustomerWaitingUI(true);
             _customer.Animator.SetBool(CustomerAnimator.IsWaitingBoolParam, true);
-            yield return new WaitForSeconds(1); // WaitUntil(() => isPaid);
 
-            // 돈 지급
-            _customer.Animator.SetBool(CustomerAnimator.IsWaitingBoolParam, false);
+            // 계산 상호작용 설정
+            bool paymentCompleted = false;
+            _customer.Interactor.SetPaymentInteraction(totalPrice, (b) =>
+            {
+                paymentCompleted = b;
+                // if (!b) { } // TODO: some animations 
+            });
+
+            float timer = 0;
+            yield return new WaitUntil(() =>
+            {
+                timer += Time.deltaTime;
+                return timer > _customer.paymentPatientTime || paymentCompleted;
+            });
+
+            // 결제를 성공한 경우 (시간 초과 X) 
+            if (paymentCompleted)
+            {
+                // 돈 지급(손님이? 게임매니저가? 직접?)
+            }
+
+            // 정리
             foreach (var product in _customer.Inventory)
             {
                 Object.Destroy(product.gameObject);
             }
 
             _customer.Inventory.Clear();
-
+            _customer.Animator.SetBool(CustomerAnimator.IsWaitingBoolParam, false);
             SetCustomerWaitingUI(false);
-            yield return null;
         }
 
         private void SetCustomerWaitingUI(bool b)
