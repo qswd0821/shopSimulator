@@ -28,7 +28,8 @@ namespace Customer
         public List<Product> Wishlist = new();
         public List<Product> Inventory = new();
 
-        public bool hasCompletedPayment;
+        [HideInInspector] public bool hasCompletedPayment;
+        [HideInInspector] public bool HasCompletedWaitngMovement;
 
         private void Awake()
         {
@@ -74,10 +75,10 @@ namespace Customer
 
         private void FindShelves()
         {
-            var foundShelves = FindObjectsByType<Shelf>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var foundShelves = Shared.GameManager.ListShelf;
 
             // 랜덤한 순서로 섞기
-            for (int i = foundShelves.Length - 1; i > 0; i--)
+            for (int i = foundShelves.Count - 1; i > 0; i--)
             {
                 int randomIndex = Random.Range(0, i + 1);
                 (foundShelves[i], foundShelves[randomIndex]) = (foundShelves[randomIndex], foundShelves[i]);
@@ -89,7 +90,10 @@ namespace Customer
             }
         }
 
-
+        public void OnWaitngLineMoveComplete()
+        {
+            HasCompletedWaitngMovement = true;
+        }
         public void OnPaymentCompleted()
         {
             hasCompletedPayment = true;
