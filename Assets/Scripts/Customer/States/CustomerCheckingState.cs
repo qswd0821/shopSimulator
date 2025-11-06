@@ -43,6 +43,8 @@ namespace Customer
             Shared.GameManager.Pos.AddWaitingForPaymentLine(_customer);
             // yield return MoveToCounter();
 
+            yield return new WaitUntil(()=>_customer.HasCompletedWaitngMovement);
+
             yield return new WaitUntil(() => Shared.GameManager.Pos.GetMyWaitNumber(_customer) == 0);
 
             yield return Pay();

@@ -221,7 +221,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 4, y: 0.6, z: 1.5}
-  m_Center: {x: 0, y: 0.3, z: -0.0054061892}
+  m_Center: {x: 0, y: 0.3, z: 0}
 --- !u!114 &6454861832577457679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,7 +236,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsAttachable: 0
   BasePoint: {fileID: 7751991198260428919}
-  Product: {fileID: 5798947308247045723, guid: 83f641716bf55944dbdea6ad996e6c6a, type: 3}
+  Product: {fileID: 5460956194406715645, guid: f8254b26aabd03741be6324e59e26166, type: 3}
   PreGenerated: 1
   Count: 8
   Row: 4
