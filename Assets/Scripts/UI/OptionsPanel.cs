@@ -18,7 +18,8 @@ public class OptionsPanel : MonoBehaviour
     {
         // 초기 UI 셋업
         quality.ClearOptions();
-        quality.AddOptions(new System.Collections.Generic.List<string>(QualitySettings.names));
+        var customNames = new System.Collections.Generic.List<string> { "High", "Middle", "Low" };
+        quality.AddOptions(customNames);
 
         // 로드
         float vol = PlayerPrefs.GetFloat(KEY_VOL, 1f);

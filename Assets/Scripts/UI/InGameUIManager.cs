@@ -14,24 +14,24 @@ public class InGameUIManager : MonoBehaviour
     // --- '시청자'가 '방송국'을 구독 신청 ---
     void OnEnable()
     {
-        // UIManager가 존재할 때만 구독 신청
-        if (UIManager.Instance != null)
+        // GameManager가 존재할 때만 구독 신청
+        if (GameManager.Instance != null)
         {
-            // "UIManager님, OnMoneyChanged 방송 하시면... 제 UpdateMoneyText 좀 실행해주세요."
-            UIManager.Instance.OnMoneyChanged += UpdateMoneyText;
+            // "GameManager님, OnMoneyChanged 방송 하시면... 제 UpdateMoneyText 좀 실행해주세요."
+            GameManager.Instance.OnMoneyChanged += UpdateMoneyText;
 
-            // "UIManager님, OnTimeChanged 방송 하시면... 제 UpdateTimeText 좀 실행해주세요."
-            UIManager.Instance.OnTimeChanged += UpdateTimeText;
+            // "GameManager님, OnTimeChanged 방송 하시면... 제 UpdateTimeText 좀 실행해주세요."
+            GameManager.Instance.OnTimeChanged += UpdateTimeText;
         }
     }
 
     // --- 구독 해지 (오류 방지) ---
     void OnDisable()
     {
-        if (UIManager.Instance != null)
+        if (GameManager.Instance != null)
         {
-            UIManager.Instance.OnMoneyChanged -= UpdateMoneyText;
-            UIManager.Instance.OnTimeChanged -= UpdateTimeText;
+            GameManager.Instance.OnMoneyChanged -= UpdateMoneyText;
+            GameManager.Instance.OnTimeChanged -= UpdateTimeText;
         }
     }
 
