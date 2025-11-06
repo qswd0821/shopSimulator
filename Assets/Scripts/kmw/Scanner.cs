@@ -9,7 +9,7 @@ public class Scanner : Item
     }
     public override void AttachUse(GameObject _Hitobj)
     {
-        // Item ½ºÅ©¸³Æ®¸¦ °¡Áø ¿ÀºêÁ§Æ®ÀÎÁö È®ÀÎ
+        // Item ìŠ¤í¬ë¦½íŠ¸ë¥¼ ê°€ì§„ ì˜¤ë¸Œì íŠ¸ì¸ì§€ í™•ì¸
         Product products = _Hitobj.GetComponent<Product>();
         if (products != null)
         { 

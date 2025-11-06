@@ -1,14 +1,14 @@
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Ui_ProductCategory : MonoBehaviour
 {
     [SerializeField]
-    Text ProductNameText;
+    TMP_Text ProductNameText;
     [SerializeField]
-    Text PriceText;
+    TMP_Text PriceText;
     [SerializeField]
-    Text NumText;
+    TMP_Text NumText;
 
     public void Init(Product _product)
     {

@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Customer
 {
@@ -7,13 +6,12 @@ namespace Customer
     {
         public ICustomerState CurrentState { get; private set; }
 
-        private ICustomerState _pendingNext; // 같은 프레임 중복 전환 방지
-        private Customer _owner;
+        private Customer _customer;
         private string _currentState;
 
         private void Awake()
         {
-            _owner = GetComponent<Customer>();
+            _customer = GetComponent<Customer>();
         }
 
         private void Start()
@@ -24,84 +22,26 @@ namespace Customer
 
         private void Update()
         {
-#if UNITY_EDITOR
-            _currentState = CurrentState?.GetType().Name ?? "null";
-#endif
+            _currentState = CurrentState.GetType().Name;
         }
 
-        #region StateMachine
-
-        // 중첩 전환은 한 프레임에 1회로 제한.
         private void ChangeState(ICustomerState next)
         {
-            if (next == null)
+            if (next == null || CurrentState?.GetType() == next?.GetType())
             {
-                Debug.Log($"{name}: EOL");
-                _owner.gameObject.SetActive(false);
+                Debug.Log($"{gameObject.name}: End of state");
+                _customer.DestroyCustomer();
                 return;
             }
-
-            if (ReferenceEquals(CurrentState, next))
-            {
-                // 재진입 방지
-                return;
-            }
-
-            if (_pendingNext != null)
-            {
-                // 이미 이번 프레임에 전환 진행 중이면 마지막 요청만 반영
-                _pendingNext = next;
-                return;
-            }
-
-            _pendingNext = next;
-            DoChange();
-            // 추가적인 ChangeState 호출이 Tick 중에 또 들어왔을 수 있음 → 한 번 더 처리
-            if (_pendingNext != null && !ReferenceEquals(_pendingNext, CurrentState))
-            {
-                DoChange();
-            }
-        }
-
-        private void DoChange()
-        {
-            var next = _pendingNext;
-            _pendingNext = null;
 
             var prev = CurrentState;
             if (prev != null)
             {
-                SafeExit(prev);
+                next.OnExit();
             }
 
             CurrentState = next;
-            SafeEnter(CurrentState);
+            next.OnEnter(_customer, ChangeState);
         }
-
-        private void SafeEnter(ICustomerState state)
-        {
-            try
-            {
-                state.OnEnter(_owner, ChangeState);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-
-        private void SafeExit(ICustomerState state)
-        {
-            try
-            {
-                state.OnExit();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-
-        #endregion StateMachine
     }
 }
