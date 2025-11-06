@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Customer.States
+namespace Customer
 {
     /// <summary>
     /// 모든 행동을 마쳤거나 오류가 난 경우 전이하는 최종 State

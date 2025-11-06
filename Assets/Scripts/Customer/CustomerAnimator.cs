@@ -9,13 +9,15 @@ namespace Customer
         public const string SpeedFloatParam = "Speed";
         public const string TurnFloatParam = "Turn";
         public const string IsMovingBoolParam = "IsMoving";
-        public const string IsWaitingBoolParam = "IsWaiting";
+        public const string IsWaitingPaymentBoolParam = "IsWaitingPayment";
+        public const string ConfuseTriggerParam = "Confuse";
         public const string PickUpTriggerParam = "PickUp";
 
         public const string IdleStateName = "Idle";
         public const string MoveStateName = "Move";
         public const string PickUpStateName = "PickUp";
-        public const string WaitStateName = "Wait";
+        public const string ConfuseStateName = "Confuse";
+        public const string WaitPaymentStateName = "WaitPayment";
 
         private static readonly int SpeedParamHash = Animator.StringToHash(SpeedFloatParam);
         private static readonly int TurnParamHash = Animator.StringToHash(TurnFloatParam);

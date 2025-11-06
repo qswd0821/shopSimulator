@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Customer.States
+namespace Customer
 {
     /// <summary>
     /// Customer 초기 State
@@ -25,13 +25,12 @@ namespace Customer.States
         {
             if (succeed)
             {
-                if (_stateCallback == null) Debug.LogWarning($"{_customer.name}: State callback is null");
-                else _stateCallback.Invoke(new CustomerShoppingState());
+                _stateCallback?.Invoke(new CustomerShoppingState());
             }
             else
             {
                 Debug.LogWarning($"{_customer.name}: Failed to move to entrance");
-                _stateCallback.Invoke(new CustomerLeavingState());
+                _stateCallback?.Invoke(new CustomerLeavingState());
             }
         }
 

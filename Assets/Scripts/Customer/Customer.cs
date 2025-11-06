@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Customer
@@ -9,7 +7,7 @@ namespace Customer
     /// <summary>
     /// Customer의 가장 최상위 클래스
     /// </summary>
-    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator))]
+    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator), typeof(CustomerInteractor))]
     public class Customer : MonoBehaviour
     {
         public CustomerMovement Movement { get; private set; }
@@ -19,18 +17,18 @@ namespace Customer
         [Header("Customer")] public GameObject customerModel;
         public GameObject customerCanvas;
         public float paymentPatientTime = 15;
-
-        public float patientTime;
-        public List<GameObject> wishList = new();
-        public List<Product> inventory = new();
+        public int wishlistInitSize = 3;
 
         // Environment
-        public readonly Queue<Shelf> Shelves = new();
-        public GameObject checkout;
         public Vector3 startPosition;
         public Vector3 exitPosition;
         public Vector3 entrancePosition;
-        public bool IsPayMent;
+
+        public Queue<Shelf> Shelves = new();
+        public List<Product> Wishlist = new();
+        public List<Product> Inventory = new();
+
+        public bool hasCompletedPayment;
 
         private void Awake()
         {
@@ -91,18 +89,24 @@ namespace Customer
             }
         }
 
+
+        public void OnPaymentCompleted()
+        {
+            hasCompletedPayment = true;
+        }
+
         private void OnDrawGizmosSelected()
         {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(startPosition, Vector3.one * 1f);
+            Gizmos.DrawWireCube(exitPosition, Vector3.one * 1f);
+            Gizmos.DrawWireCube(entrancePosition, Vector3.one * 1f);
+
             Gizmos.color = Color.red;
             foreach (var shelf in Shelves)
             {
                 Gizmos.DrawWireCube(shelf.transform.position, Vector3.one * 1.5f);
             }
-        }
-
-        public void OnFinishPayMent()
-        {
-            IsPayMent = true;
         }
     }
 }

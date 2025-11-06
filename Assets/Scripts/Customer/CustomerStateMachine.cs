@@ -1,5 +1,4 @@
-﻿using Customer.States;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Customer
 {

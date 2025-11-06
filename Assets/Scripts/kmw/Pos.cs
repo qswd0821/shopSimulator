@@ -1,31 +1,24 @@
-using Customer;
-using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class Pos : MonoBehaviour
 {
     List<GameObject> ListProductCategory = new List<GameObject>();
 
-    // °áÁ¦ ´ë±â¶óÀÎ ¹× °áÁ¦ ´ë±âÁßÀÎ ¼Õ´Ô ¸®½ºÆ®
-    [SerializeField]
-    List<GameObject> ListWaitingforPayMentLine = new List<GameObject>();
-    [SerializeField]
-    List<Customer.Customer> ListCustomer = new List<Customer.Customer>();
+    // ê²°ì œ ëŒ€ê¸°ë¼ì¸ ë° ê²°ì œ ëŒ€ê¸°ì¤‘ì¸ ì†ë‹˜ ë¦¬ìŠ¤íŠ¸
+    [SerializeField] List<GameObject> ListWaitingforPayMentLine = new List<GameObject>();
+    [SerializeField] List<Customer.Customer> ListCustomer = new List<Customer.Customer>();
 
-    [SerializeField]
-    GameObject ParentProductCategory;
-    [SerializeField]
-    GameObject ProductCategory;
-    [SerializeField]
-    Text TotalNumText;
-    [SerializeField]
-    Shelf CheckPointShelf;
+    [SerializeField] GameObject ParentProductCategory;
+    [SerializeField] GameObject ProductCategory;
+    [SerializeField] TMP_Text TotalNumText;
+    [SerializeField] Shelf CheckPointShelf;
 
     int TotalNum;
-    Customer.Customer CurrCustomer;
+    Customer.Customer CurrentCustomer;
 
     void Start()
     {
@@ -35,42 +28,42 @@ public class Pos : MonoBehaviour
 
     public void AddProductCategory(Product _product)
     {
-        // »óÇ° ¸ñ·Ï Ui »ı¼º
+        // ìƒí’ˆ ëª©ë¡ Ui ìƒì„±
         GameObject obj = Instantiate(ProductCategory);
-        obj.transform.SetParent(ParentProductCategory.transform,false);
+        obj.transform.SetParent(ParentProductCategory.transform, false);
         obj.GetComponent<Ui_ProductCategory>().Init(_product);
 
         ListProductCategory.Add(obj);
 
         TotalNum += _product.GetPrice();
-        TotalNumText.text = TotalNum.ToString();
+        TotalNumText.text = $"Total: {TotalNum}";
     }
 
-    //°áÁ¦
-    public void OnPayMent()
+    //ê²°ì œ
+    public void OnPayment()
     {
-        //¼Õ´ÔÀÌ ¾øÀ» °æ¿ì °áÁ¦ÇÏÁö ¾ÊÀ½
+        //ì†ë‹˜ì´ ì—†ì„ ê²½ìš° ê²°ì œí•˜ì§€ ì•ŠìŒ
         if (ListCustomer.Count <= 0) return;
 
         Shared.GameManager.Player.AddMoney(TotalNum);
         PosReset();
 
-        // °è»ê´ë À§ ¹°°Ç Á¦°Å
+        // ê³„ì‚°ëŒ€ ìœ„ ë¬¼ê±´ ì œê±°
         CheckPointShelf.DeleteAll();
 
-        // ¸Ç ¾Õ ¼Õ´Ô Á¦°Å
+        // ë§¨ ì• ì†ë‹˜ ì œê±°
         Customer.Customer front = ListCustomer[0];
         ListCustomer.RemoveAt(0);
-        front.OnFinishPayMent();
+        front.OnPaymentCompleted();
 
-        // ³²Àº ¼Õ´Ô ÁÙ ÀçÁ¤·Ä
-        StartCoroutine(IDelayRefresh());
+        // ë‚¨ì€ ì†ë‹˜ ì¤„ ì¬ì •ë ¬
+        StartCoroutine(DelayRefresh());
     }
 
     void PosReset()
     {
         TotalNum = 0;
-        TotalNumText.text = TotalNum.ToString();
+        TotalNumText.text = $"Total: {TotalNum}";
         RemoveAllProductCategory();
     }
 
@@ -80,6 +73,7 @@ public class Pos : MonoBehaviour
         {
             Destroy(ListProductCategory[i]);
         }
+
         ListProductCategory.Clear();
     }
 
@@ -89,34 +83,32 @@ public class Pos : MonoBehaviour
         CheckPointShelf.AddProduct(_product);
     }
 
-    public void AddWaitingForPayMentLine(Customer.Customer _custormer)
+    public void AddWaitingForPaymentLine(Customer.Customer _custormer)
     {
-        Vector3 WaitLinePos = GetWiteLinePosition();
-        _custormer.Movement.MoveTo(WaitLinePos,(succeed) =>
-        {
-            OnCustomerArrivedAtLine(_custormer);
-        });
+        Vector3 WaitLinePos = GetWaitingLinePosition();
         ListCustomer.Add(_custormer);
+        _custormer.Movement.MoveTo(WaitLinePos, (_) => { OnCustomerArrivedAtLine(_custormer); });
     }
 
-    Vector3 GetWiteLinePosition()
+    Vector3 GetWaitingLinePosition()
     {
-        int Idx = ListCustomer.Count;
-        return ListWaitingforPayMentLine[Idx].transform.position;
+        int index = ListCustomer.Count;
+        return ListWaitingforPayMentLine[index].transform.position;
     }
 
-    public int GetMyWaitNumber(Customer.Customer _custormer)
+    public int GetMyWaitNumber(Customer.Customer _customer)
     {
-        return ListCustomer.IndexOf(_custormer);
+        return ListCustomer.IndexOf(_customer);
     }
 
 
-    IEnumerator IDelayRefresh()
+    IEnumerator DelayRefresh()
     {
         yield return new WaitForSeconds(0.2f);
         RefreshWaitingLine();
     }
-    // ÁÙ ÀçÁ¤·Ä (¸Ç ¾Õ ¼Õ´Ô ºüÁú¶§ È£Ãâ)
+
+    // ì¤„ ì¬ì •ë ¬ (ë§¨ ì• ì†ë‹˜ ë¹ ì§ˆë•Œ í˜¸ì¶œ)
     void RefreshWaitingLine()
     {
         for (int i = 0; i < ListCustomer.Count; i++)
@@ -125,37 +117,29 @@ public class Pos : MonoBehaviour
             ListCustomer[i].Movement.MoveTo(nextPos);
         }
     }
+
     void OnCustomerArrivedAtLine(Customer.Customer customer)
     {
-        // ÀÎµ¦½º Ã£±â
+        // ì¸ë±ìŠ¤ ì°¾ê¸°
         int myIdx = ListCustomer.IndexOf(customer);
-        if (myIdx == -1) return; // ¸®½ºÆ®¿¡ ¾øÀ¸¸é ¹«½Ã
+        if (myIdx == -1) return; // ë¦¬ìŠ¤íŠ¸ì— ì—†ìœ¼ë©´ ë¬´ì‹œ
 
-        // µÚ¿¡ »ç¶÷ÀÌ ÀÖ¾î¾ß ÁøÇà
+        // ë’¤ì— ì‚¬ëŒì´ ìˆì–´ì•¼ ì§„í–‰
         int nextIdx = myIdx + 1;
         if (nextIdx >= ListCustomer.Count) return;
 
         var next = ListCustomer[nextIdx];
         if (next == null) return;
 
-        // ÀÌ¹Ì µµÂøÇÑ »óÅÂ¸é(HasArrivedAtDestination == true) ´Ù½Ã ÀÌµ¿½ÃÅ³ ÇÊ¿ä ¾øÀ½
+        // ì´ë¯¸ ë„ì°©í•œ ìƒíƒœë©´(HasArrivedAtDestination == true) ë‹¤ì‹œ ì´ë™ì‹œí‚¬ í•„ìš” ì—†ìŒ
         if (next.Movement.HasArrivedAtDestination()) return;
 
-        // µÚ»ç¶÷Àº 'µµÂøÇÑ »ç¶÷ ÀÚ¸®'·Î ÇÑ Ä­ ¾ÕÀ¸·Î ´ç°Ü¾ß ÇÔ
-        // (myIdx À§Ä¡°¡ ¾Õ»ç¶÷ÀÇ ÀÚ¸®)
+        // ë’¤ì‚¬ëŒì€ 'ë„ì°©í•œ ì‚¬ëŒ ìë¦¬'ë¡œ í•œ ì¹¸ ì•ìœ¼ë¡œ ë‹¹ê²¨ì•¼ í•¨
+        // (myIdx ìœ„ì¹˜ê°€ ì•ì‚¬ëŒì˜ ìë¦¬)
         if (myIdx < ListWaitingforPayMentLine.Count)
         {
             Vector3 targetPos = ListWaitingforPayMentLine[myIdx].transform.position;
             next.Movement.MoveTo(targetPos);
-        }
-    }
-
-    public void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        for(int i =0;i< ListWaitingforPayMentLine.Count;++i)
-        {
-            Gizmos.DrawCube(ListWaitingforPayMentLine[i].transform.position,Vector3.one * 5f);
         }
     }
 }

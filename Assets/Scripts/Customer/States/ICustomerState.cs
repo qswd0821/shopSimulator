@@ -1,4 +1,4 @@
-﻿namespace Customer.States
+﻿namespace Customer
 {
     public interface ICustomerState
     {

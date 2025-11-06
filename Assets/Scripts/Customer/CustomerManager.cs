@@ -31,7 +31,7 @@ namespace Customer
         [SerializeField] private GameObject productPrefab;
         [SerializeField] private Transform checkout;
 
-        [Header("Positions")] public GameObject counter;
+        [Header("Positions")] public Vector3 counterPosition;
         public Vector3 exitPosition;
         public Vector3 entrancePosition;
         public Vector3 startPosition;
@@ -64,6 +64,8 @@ namespace Customer
         private void Init()
         {
             // Set available products
+            AvailableProducts.Clear();
+
             var products = FindObjectsByType<Product>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             for (var i = products.Length - 1; i > 0; i--)
             {
@@ -83,7 +85,7 @@ namespace Customer
             Gizmos.DrawCube(startPosition, Vector3.one * 1f);
             Gizmos.DrawCube(entrancePosition, Vector3.one * 1f);
             Gizmos.DrawCube(exitPosition, Vector3.one * 1f);
-            Gizmos.DrawCube(counter.transform.position, Vector3.one * 1f);
+            Gizmos.DrawCube(counterPosition, Vector3.one * 1f);
         }
 
         #region DEBUG
@@ -93,6 +95,8 @@ namespace Customer
         private void OnGUI()
         {
             if (!debugMode) return;
+            Cursor.lockState = CursorLockMode.None;
+
             if (GUILayout.Button("Init"))
             {
                 Init();

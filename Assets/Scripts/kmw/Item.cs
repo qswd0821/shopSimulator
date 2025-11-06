@@ -1,4 +1,3 @@
-using NUnit.Framework.Constraints;
 using UnityEngine;
 
 public abstract class Item : MonoBehaviour
@@ -28,7 +27,7 @@ public abstract class Item : MonoBehaviour
         AttachRotation = Quaternion.identity;
         IsAttachable = true;
     }
-    public bool TryAttach(Player _Owner) // ÀåÂø
+    public bool TryAttach(Player _Owner) // ìž¥ì°©
     {
         if (IsAttachable == false)
             return false;
@@ -42,7 +41,7 @@ public abstract class Item : MonoBehaviour
         return true;
     }
 
-    public void Detach() // ÇØÁ¦
+    public void Detach() // í•´ì œ
     {
         Debug.Log("Detach");
         transform.SetParent(null, true);

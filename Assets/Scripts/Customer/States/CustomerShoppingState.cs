@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-namespace Customer.States
+namespace Customer
 {
     /// <summary>
     /// 매장 내에서 위시리스트에 맞춰서 쇼핑을 진행하는 상태.
@@ -43,11 +44,13 @@ namespace Customer.States
                 yield break;
             }
 
+
             // 매장 내 모든 선반으로 이동 (랜덤)
             foreach (var shelf in _customer.Shelves)
             {
                 yield return MoveToShelf(shelf.transform.position);
                 yield return SearchShelfForWishlistItems(shelf);
+                if (IsShoppingComplete()) break;
             }
 
             // 물건을 하나라도 집은 경우
@@ -60,6 +63,9 @@ namespace Customer.States
                 _stateCallback.Invoke(new CustomerLeavingState());
             }
         }
+
+        private bool IsShoppingComplete()
+            => _customer.Wishlist.Count == 0;
 
 
         private IEnumerator MoveToShelf(Vector3 position)
@@ -79,40 +85,50 @@ namespace Customer.States
             return new WaitUntil(() => moveComplete);
         }
 
-        // TODO: Shelf와 상호작용 필요
         private IEnumerator SearchShelfForWishlistItems(Shelf shelf)
         {
-            var pickedProducts = new List<Product>();
-            for (int i = 0; i < _customer.Wishlist.Count; i++)
+            var foundProducts = new List<Product>();
+            foreach (var productData in _customer.Wishlist)
             {
-                // if (shelf.HasProduct(_customer.Wishlist[i]))
-                // {
-                //     pickedProducts.Add(shelf.Pop());
-                //     break;
-                // }
+            }
+
+            int index = 0;
+            while (index < _customer.Wishlist.Count)
+            {
+                var productData = _customer.Wishlist[index];
+                var p = shelf.GetProduct(productData.GetId());
+                if (p)
+                {
+                    foundProducts.Add(p);
+                    AddProductToInventory(p);
+                    _customer.Wishlist.RemoveAt(index);
+                }
+                else index++;
             }
 
             // Wishlist의 아이템이 선반에 있는 경우
-            if (pickedProducts.Count > 0)
-            {
-                foreach (var product in pickedProducts)
-                {
-                    _customer.Wishlist.Remove(product);
-                    _customer.Inventory.Add(product);
-                }
 
+            if (foundProducts.Count > 0)
+            {
                 _customer.Animator.SetTrigger(CustomerAnimator.PickUpTriggerParam);
                 yield return _customer.Animator.WaitForAnimation(CustomerAnimator.PickUpStateName);
             }
             // 아예 없는 경우
             else
             {
-                // TODO: Wait Animation 설정
-                // _customer.Animator.SetTrigger(CustomerAnimator.PickUpTriggerParam);
-                // yield return _customer.Animator.WaitForAnimation(CustomerAnimator.PickUpStateName);
+                _customer.Animator.SetTrigger(CustomerAnimator.ConfuseTriggerParam);
+                yield return _customer.Animator.WaitForAnimation(CustomerAnimator.ConfuseStateName);
             }
 
             yield return null;
+        }
+
+        private void AddProductToInventory(Product product)
+        {
+            product.SetBodyActive(false);
+            product.transform.SetParent(_customer.transform, false);
+            product.transform.localPosition = Vector3.zero;
+            _customer.Inventory.Add(product);
         }
     }
 }

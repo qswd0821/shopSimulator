@@ -2,17 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-// Áø¿­´ë
+
+// ì§„ì—´ëŒ€
 public class Shelf : Item
 {
-    [SerializeField]
-    Queue<Product> QueProduct = new Queue<Product>();
+    [SerializeField] Queue<Product> QueProduct = new Queue<Product>();
 
-    [SerializeField]
-    Transform BasePoint;
+    [SerializeField] Transform BasePoint;
 
-    [SerializeField]
-    Product Product;
+    [SerializeField] Product Product;
 
     public bool PreGenerated;
     public int Count;
@@ -20,6 +18,7 @@ public class Shelf : Item
     public int Col;
     public float Xspacing = 30f;
     public float Yspacing = 30f;
+
     protected override void Init()
     {
         base.Init();
@@ -27,15 +26,16 @@ public class Shelf : Item
         Id = 15;
         Shared.GameManager.ListShelf.Add(this);
 
-        // »çÀü »ı¼º
-        if(PreGenerated)
+        // ì‚¬ì „ ìƒì„±
+        if (PreGenerated)
         {
             DoPreGenerated();
         }
     }
+
     void DoPreGenerated()
     {
-        for(int i = 0; i < Count;++i)
+        for (int i = 0; i < Count; ++i)
         {
             Product product = Instantiate(Product);
             product.transform.localPosition = GetSlotPosition(i);
@@ -46,6 +46,7 @@ public class Shelf : Item
             QueProduct.Enqueue(product);
         }
     }
+
     public override void AttachUse(GameObject _Hitobj)
     {
         return;
@@ -62,15 +63,19 @@ public class Shelf : Item
 
         _product.transform.SetParent(BasePoint, true);
         _product.transform.localRotation = Quaternion.identity;
-        _product.transform.localScale = new Vector3(15f / transform.localScale.x, 
-            15f / transform.localScale.y, 
-            15f / transform.localScale.z);
+        // _product.transform.localScale = new Vector3(15f / transform.localScale.x, 
+        //     15f / transform.localScale.y, 
+        //     15f / transform.localScale.z);
         //_product.transform.localScale = Vector3.one;
 
         QueProduct.Enqueue(_product);
     }
 
-    public int GetCount() { return QueProduct.Count; }
+    public int GetCount()
+    {
+        return QueProduct.Count;
+    }
+
     public Vector3 GetSlotPosition(int _index)
     {
         int r = _index / Col;
@@ -97,6 +102,7 @@ public class Shelf : Item
             Product product = QueProduct.Dequeue();
             Destroy(product.gameObject);
         }
+
         QueProduct.Clear();
     }
 }
