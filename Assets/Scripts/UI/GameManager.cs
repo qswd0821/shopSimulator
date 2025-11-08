@@ -1,64 +1,71 @@
 using UnityEngine;
-using System; // C# ÀÌº¥Æ®(Action)¸¦ »ç¿ëÇÏ±â À§ÇØ ÇÊ¿ä
+using System; // C# ì´ë²¤íŠ¸(Action)ë¥¼ ì‚¬ìš©í•˜ê¸° ìœ„í•´ í•„ìš”
 
-// °ÔÀÓÀÇ ÇÙ½É »óÅÂ (¿¹½Ã)
-public enum GameState { Playing, Paused }
-
-public class GameManager : MonoBehaviour
+namespace UI
 {
-    // 1. ½Ì±ÛÅæ(Singleton) ÆĞÅÏ: ¾À ¾îµğ¿¡¼­³ª GameManager.Instance·Î ½±°Ô Á¢±Ù °¡´É
-    public static GameManager Instance { get; private set; }
-
-    [Header("ÇÙ½É µ¥ÀÌÅÍ")]
-    public int Money; // ÇöÀç ¼ÒÁö±İ
-    public int CurrentDay; // ÇöÀç ³¯Â¥ (Day 1, Day 2...)
-    public float GameTime; // ÇöÀç ½Ã°£ (¿¹: 9.0f = 09:00, 18.5f = 18:30)
-    public GameState CurrentState;
-
-    // 2. '¹æ¼Û±¹ (API)': ´Ù¸¥ ½Ã½ºÅÛ(UI µî)ÀÌ ±¸µ¶ÇÒ ÀÌº¥Æ®
-    // µ·ÀÌ º¯°æµÇ¸é int(»õ ±İ¾×) °ªÀ» ¹æ¼Û
-    public event Action<int> OnMoneyChanged;
-    // ½Ã°£ÀÌ º¯°æµÇ¸é float(»õ ½Ã°£) °ªÀ» ¹æ¼Û
-    public event Action<float> OnTimeChanged;
-
-    void Awake()
+// ê²Œì„ì˜ í•µì‹¬ ìƒíƒœ (ì˜ˆì‹œ)
+    public enum GameState
     {
-        // ½Ì±ÛÅæ ¼³Á¤
-        if (Instance != null && Instance != this) Destroy(gameObject);
-        else Instance = this;
+        Playing,
+        Paused
     }
 
-    void Start()
+    public class GameManager : MonoBehaviour
     {
-        // °ÔÀÓ ½ÃÀÛ ½Ã ÃÊ±â°ª ¼³Á¤
-        CurrentDay = 1;
-        GameTime = 9.0f; // ¿ÀÀü 9½Ã
-        ChangeMoney(50000); // ÃÊ±â ÀÚ±İ 5¸¸¿ø (ChangeMoney¸¦ ½á¾ß ¹æ¼ÛÀÌ µÊ)
-        CurrentState = GameState.Playing;
-    }
+        // 1. ì‹±ê¸€í†¤(Singleton) íŒ¨í„´: ì”¬ ì–´ë””ì—ì„œë‚˜ GameManager.Instanceë¡œ ì‰½ê²Œ ì ‘ê·¼ ê°€ëŠ¥
+        public static GameManager Instance { get; private set; }
 
-    void Update()
-    {
-        // °ÔÀÓ ÇÃ·¹ÀÌ ÁßÀÏ ¶§¸¸ ½Ã°£ Èå¸£±â (¿¹½Ã)
-        if (CurrentState == GameState.Playing)
+        [Header("í•µì‹¬ ë°ì´í„°")] public int Money; // í˜„ì¬ ì†Œì§€ê¸ˆ
+        public int CurrentDay; // í˜„ì¬ ë‚ ì§œ (Day 1, Day 2...)
+        public float GameTime; // í˜„ì¬ ì‹œê°„ (ì˜ˆ: 9.0f = 09:00, 18.5f = 18:30)
+        public GameState CurrentState;
+
+        // 2. 'ë°©ì†¡êµ­ (API)': ë‹¤ë¥¸ ì‹œìŠ¤í…œ(UI ë“±)ì´ êµ¬ë…í•  ì´ë²¤íŠ¸
+        // ëˆì´ ë³€ê²½ë˜ë©´ int(ìƒˆ ê¸ˆì•¡) ê°’ì„ ë°©ì†¡
+        public event Action<int> OnMoneyChanged;
+
+        // ì‹œê°„ì´ ë³€ê²½ë˜ë©´ float(ìƒˆ ì‹œê°„) ê°’ì„ ë°©ì†¡
+        public event Action<float> OnTimeChanged;
+
+        void Awake()
         {
-            GameTime += Time.deltaTime * 0.1f; // (¼Óµµ Á¶Àı ÇÊ¿ä!)
-            OnTimeChanged?.Invoke(GameTime); // ½Ã°£ º¯°æ '¹æ¼Û'
+            // ì‹±ê¸€í†¤ ì„¤ì •
+            if (Instance != null && Instance != this) Destroy(gameObject);
+            else Instance = this;
         }
-    }
 
-    // 3. 'ÇÙ½É API ÇÔ¼ö': 3¹ø ÆÀ¿ø(ÆíÀÇÁ¡ ½Ã½ºÅÛ)ÀÌ ÀÌ ÇÔ¼ö¸¦ È£ÃâÇÒ °Ì´Ï´Ù.
+        void Start()
+        {
+            // ê²Œì„ ì‹œì‘ ì‹œ ì´ˆê¸°ê°’ ì„¤ì •
+            CurrentDay = 1;
+            GameTime = 9.0f; // ì˜¤ì „ 9ì‹œ
+            ChangeMoney(50000); // ì´ˆê¸° ìê¸ˆ 5ë§Œì› (ChangeMoneyë¥¼ ì¨ì•¼ ë°©ì†¡ì´ ë¨)
+            CurrentState = GameState.Playing;
+        }
 
-    /// <summary>
-    /// µ·À» º¯°æÇÏ°í UI¿¡ Áï½Ã ¹æ¼ÛÇÕ´Ï´Ù.
-    /// (¾ç¼ö: ¹ú±â, À½¼ö: ¾²±â)
-    /// </summary>
-    public void ChangeMoney(int amount)
-    {
-        Money += amount;
+        void Update()
+        {
+            // ê²Œì„ í”Œë ˆì´ ì¤‘ì¼ ë•Œë§Œ ì‹œê°„ íë¥´ê¸° (ì˜ˆì‹œ)
+            if (CurrentState == GameState.Playing)
+            {
+                GameTime += Time.deltaTime * 0.1f; // (ì†ë„ ì¡°ì ˆ í•„ìš”!)
+                OnTimeChanged?.Invoke(GameTime); // ì‹œê°„ ë³€ê²½ 'ë°©ì†¡'
+            }
+        }
 
-        // OnMoneyChanged ÀÌº¥Æ®¿¡ '±¸µ¶'ÇÑ ¸ğµç ´ë»ó(UI)¿¡°Ô
-        // º¯°æµÈ Money °ªÀ» ¾Ë¸² (¹æ¼Û)
-        OnMoneyChanged?.Invoke(Money);
+        // 3. 'í•µì‹¬ API í•¨ìˆ˜': 3ë²ˆ íŒ€ì›(í¸ì˜ì  ì‹œìŠ¤í…œ)ì´ ì´ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•  ê²ë‹ˆë‹¤.
+
+        /// <summary>
+        /// ëˆì„ ë³€ê²½í•˜ê³  UIì— ì¦‰ì‹œ ë°©ì†¡í•©ë‹ˆë‹¤.
+        /// (ì–‘ìˆ˜: ë²Œê¸°, ìŒìˆ˜: ì“°ê¸°)
+        /// </summary>
+        public void ChangeMoney(int amount)
+        {
+            Money += amount;
+
+            // OnMoneyChanged ì´ë²¤íŠ¸ì— 'êµ¬ë…'í•œ ëª¨ë“  ëŒ€ìƒ(UI)ì—ê²Œ
+            // ë³€ê²½ëœ Money ê°’ì„ ì•Œë¦¼ (ë°©ì†¡)
+            OnMoneyChanged?.Invoke(Money);
+        }
     }
 }
