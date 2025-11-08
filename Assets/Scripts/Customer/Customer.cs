@@ -7,22 +7,18 @@ namespace Customer
     /// <summary>
     /// Customer의 가장 최상위 클래스
     /// </summary>
-    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator), typeof(CustomerInteractor))]
+    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator), typeof(CustomerInteractor)), RequireComponent(
+         typeof(CustomerStateMachine))]
     public class Customer : MonoBehaviour
     {
         public CustomerMovement Movement { get; private set; }
         public CustomerAnimator Animator { get; private set; }
         public CustomerInteractor Interactor { get; private set; }
+        public CustomerStateMachine StateMachine { get; private set; }
 
-        [Header("Customer")] public GameObject customerModel;
-        public GameObject customerCanvas;
+        [Header("Customer")] public GameObject customerCanvas;
         public float paymentPatientTime = 15;
         public int wishlistInitSize = 3;
-
-        // Environment
-        public Vector3 startPosition;
-        public Vector3 exitPosition;
-        public Vector3 entrancePosition;
 
         public Queue<Shelf> Shelves = new();
         public List<Product> Wishlist = new();
@@ -36,17 +32,33 @@ namespace Customer
             Movement = GetComponent<CustomerMovement>();
             Animator = GetComponent<CustomerAnimator>();
             Interactor = GetComponent<CustomerInteractor>();
+            StateMachine = GetComponent<CustomerStateMachine>();
 
-            Init();
+            Movement.enabled = false;
+            Animator.enabled = false;
+            Interactor.enabled = false;
+            StateMachine.enabled = false;
         }
 
-        private void Init()
+        public void Init(GameObject model)
         {
+            SetModel(model);
             SetWishlist();
             FindShelves();
-            CustomerManager.Instance.startPosition.y = transform.localPosition.y;
-            CustomerManager.Instance.exitPosition.y = transform.localPosition.y;
-            CustomerManager.Instance.entrancePosition.y = transform.localPosition.y;
+
+            Movement.enabled = true;
+            Animator.enabled = true;
+            Interactor.enabled = true;
+            StateMachine.enabled = true;
+        }
+
+        private void SetModel(GameObject model)
+        {
+            model.transform.SetParent(transform, false);
+            model.transform.localPosition = Vector3.zero;
+            model.transform.localRotation = Quaternion.identity;
+            model.transform.localScale = Vector3.one;
+            model.SetActive(true);
         }
 
         public void DestroyCustomer()
@@ -94,6 +106,7 @@ namespace Customer
         {
             HasCompletedWaitngMovement = true;
         }
+
         public void OnPaymentCompleted()
         {
             hasCompletedPayment = true;
@@ -101,11 +114,6 @@ namespace Customer
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(startPosition, Vector3.one * 1f);
-            Gizmos.DrawWireCube(exitPosition, Vector3.one * 1f);
-            Gizmos.DrawWireCube(entrancePosition, Vector3.one * 1f);
-
             Gizmos.color = Color.red;
             foreach (var shelf in Shelves)
             {

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Customer
 {
@@ -22,19 +23,20 @@ namespace Customer
 
         private static CustomerManager _instance;
 
-        public bool debugMode;
-        [Space(10)] [SerializeField] private GameObject customerPrefab;
-        [SerializeField] private GameObject[] customerModels;
+        [Header("Debug")] [SerializeField] private bool showDebugUI = false;
 
-        [Header("Environment")] [SerializeField]
-        private Shelf[] shelves;
-        [SerializeField] private GameObject productPrefab;
-        [SerializeField] private Transform checkout;
+        [Header("Customer")] [SerializeField] private GameObject customerPrefab;
+        [SerializeField] private GameObject customerModelPrefab;
 
-        [Header("Positions")] public Vector3 counterPosition;
-        public Vector3 exitPosition;
-        public Vector3 entrancePosition;
-        public Vector3 startPosition;
+        [Header("Positions")] public Transform init;
+        public Transform entrance;
+        public Transform counter;
+        public Transform exit;
+
+        public Vector3 CounterPosition => Shared.GameManager.Pos?.transform.position ?? Vector3.zero;
+        public Vector3 ExitPosition => exit?.position ?? Vector3.zero;
+        public Vector3 EntrancePosition => entrance?.position ?? Vector3.zero;
+        public Vector3 InitPosition => init?.position ?? Vector3.zero;
 
         public readonly Queue<Product> AvailableProducts = new(); // Random order
 
@@ -79,109 +81,37 @@ namespace Customer
             }
         }
 
+        public void CreateCustomer()
+        {
+            var customer = Instantiate(customerPrefab).GetComponent<Customer>();
+            var customerModel = Instantiate(customerModelPrefab);
+            int modelTypeCount = 19;
+            customerModel.transform.GetChild(Random.Range(0, modelTypeCount)).gameObject.SetActive(true);
+
+            customer.Init(customerModel);
+        }
+
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.magenta;
-            Gizmos.DrawCube(startPosition, Vector3.one * 1f);
-            Gizmos.DrawCube(entrancePosition, Vector3.one * 1f);
-            Gizmos.DrawCube(exitPosition, Vector3.one * 1f);
-            Gizmos.DrawCube(counterPosition, Vector3.one * 1f);
+            Gizmos.DrawCube(InitPosition, Vector3.one * 1f);
+            Gizmos.DrawCube(EntrancePosition, Vector3.one * 1f);
+            Gizmos.DrawCube(ExitPosition, Vector3.one * 1f);
+
+            if (!Application.isEditor)
+            {
+                Gizmos.DrawCube(CounterPosition, Vector3.one * 1f);
+            }
         }
-
-        #region DEBUG
-
-        private string _moneyTextField;
 
         private void OnGUI()
         {
-            if (!debugMode) return;
-            Cursor.lockState = CursorLockMode.None;
-
-            if (GUILayout.Button("Init"))
-            {
-                Init();
-            }
-
-            if (GUILayout.Button("Create Product"))
-            {
-                CreateProductIntoShelf();
-            }
+            if (!showDebugUI) return;
 
             if (GUILayout.Button("Create Customer"))
             {
                 CreateCustomer();
             }
-
-            if (GUILayout.Button("Attack Customers"))
-            {
-                AttackCustomers();
-            }
-
-            _moneyTextField = GUILayout.TextArea(_moneyTextField);
-            if (GUILayout.Button("Payment"))
-            {
-                if (int.TryParse(_moneyTextField, out int money))
-                {
-                    Payment(money);
-                }
-                else
-                {
-                    Debug.Log("Invalid Input");
-                }
-            }
         }
-
-        private void CreateProductIntoShelf()
-        {
-            var p = Instantiate(productPrefab).GetComponent<Product>();
-            shelves[0].AddProduct(p);
-        }
-
-        private void AttackCustomers()
-        {
-            var customers =
-                FindObjectsByType<Customer>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-            if (customers.Length == 0)
-            {
-                Debug.Log("No Customer");
-                return;
-            }
-
-            foreach (var item in customers)
-            {
-                if (item.TryGetComponent(out ICustomerInteraction interaction))
-                {
-                    interaction.Attack();
-                }
-            }
-        }
-
-        private void Payment(int money)
-        {
-            var customers =
-                FindObjectsByType<Customer>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-            if (customers.Length == 0)
-            {
-                Debug.Log("No Customer");
-                return;
-            }
-
-            foreach (var item in customers)
-            {
-                if (item.TryGetComponent(out ICustomerInteraction interaction))
-                {
-                    bool succeed = interaction.ValidatePayment(money);
-                    Debug.Log($"{item.name}: {succeed}");
-                }
-            }
-        }
-
-        private void CreateCustomer()
-        {
-            var customer = Instantiate(customerPrefab);
-            customer.transform.position = startPosition;
-        }
-
-        #endregion
     }
 }

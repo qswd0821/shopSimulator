@@ -55,11 +55,11 @@ namespace Customer
         private IEnumerator MoveToCounter()
         {
             bool moveCompleted = false;
-            _customer.Movement.MoveTo(CustomerManager.Instance.counterPosition, b =>
+            _customer.Movement.MoveTo(CustomerManager.Instance.CounterPosition, b =>
             {
                 if (!b)
                 {
-                    Debug.LogWarning($"{_customer.name}: Failed to move to counterPosition");
+                    Debug.LogWarning($"{_customer.name}: Failed to move to CounterPosition");
                     _stateCallback?.Invoke(new CustomerLeavingState());
                     return;
                 }
