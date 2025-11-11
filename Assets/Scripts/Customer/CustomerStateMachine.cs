@@ -26,6 +26,16 @@ namespace Customer
             _currentState = CurrentState.GetType().Name;
         }
 
+        public void StartState()
+        {
+            ChangeState(new CustomerEnteringState());
+        }
+
+        public void StartState(ICustomerState state)
+        {
+            ChangeState(state);
+        }
+
         private void ChangeState(ICustomerState next)
         {
             if (next == null || CurrentState?.GetType() == next?.GetType())

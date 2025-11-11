@@ -30,7 +30,6 @@ namespace Customer
 
         [Header("Positions")] public Transform init;
         public Transform entrance;
-        public Transform counter;
         public Transform exit;
 
         public Vector3 CounterPosition => Shared.GameManager.Pos?.transform.position ?? Vector3.zero;
@@ -81,14 +80,17 @@ namespace Customer
             }
         }
 
-        public void CreateCustomer()
+        public void CreateCustomer(ICustomerState state = null)
         {
             var customer = Instantiate(customerPrefab).GetComponent<Customer>();
             var customerModel = Instantiate(customerModelPrefab);
             int modelTypeCount = 19;
             customerModel.transform.GetChild(Random.Range(0, modelTypeCount)).gameObject.SetActive(true);
 
-            customer.Init(customerModel);
+            if (state == null)
+                customer.Init(customerModel);
+            else
+                customer.Init(customerModel, state);
         }
 
         private void OnDrawGizmosSelected()
@@ -111,6 +113,11 @@ namespace Customer
             if (GUILayout.Button("Create Customer"))
             {
                 CreateCustomer();
+            }
+
+            if (GUILayout.Button("Create TestCustomer"))
+            {
+                CreateCustomer(new CustomerTestMovingState());
             }
         }
     }

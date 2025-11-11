@@ -40,7 +40,7 @@ namespace Customer
             StateMachine.enabled = false;
         }
 
-        public void Init(GameObject model)
+        public void Init(GameObject model, ICustomerState testState = null)
         {
             SetModel(model);
             SetWishlist();
@@ -50,6 +50,11 @@ namespace Customer
             Animator.enabled = true;
             Interactor.enabled = true;
             StateMachine.enabled = true;
+
+            if (testState == null)
+                StateMachine.StartState();
+            else
+                StateMachine.StartState(testState);
         }
 
         private void SetModel(GameObject model)
