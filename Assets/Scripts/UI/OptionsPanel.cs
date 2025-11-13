@@ -1,49 +1,53 @@
-// OptionsPanel.cs (±³Ã¼/º¸°­)
+// OptionsPanel.cs (ï¿½ï¿½Ã¼/ï¿½ï¿½ï¿½ï¿½)
+
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-public class OptionsPanel : MonoBehaviour
+namespace UI
 {
-    [SerializeField] private Slider masterVol;
-    [SerializeField] private TMP_Dropdown quality;
-    [SerializeField] private Toggle vSyncToggle;          // ¼±ÅÃ: Åä±Û ÇÏ³ª Ãß°¡
-    [SerializeField] private Button btnClose;
-
-    const string KEY_VOL = "opt_master_vol";
-    const string KEY_QUAL = "opt_quality";
-    const string KEY_VSYNC = "opt_vsync";
-
-    void Start()
+    public class OptionsPanel : MonoBehaviour
     {
-        // ÃÊ±â UI ¼Â¾÷
-        quality.ClearOptions();
-        var customNames = new System.Collections.Generic.List<string> { "High", "Middle", "Low" };
-        quality.AddOptions(customNames);
+        [SerializeField] private Slider masterVol;
+        [SerializeField] private TMP_Dropdown quality;
+        [SerializeField] private Toggle vSyncToggle;          // ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ ï¿½ß°ï¿½
+        [SerializeField] private Button btnClose;
 
-        // ·Îµå
-        float vol = PlayerPrefs.GetFloat(KEY_VOL, 1f);
-        int q = PlayerPrefs.GetInt(KEY_QUAL, QualitySettings.GetQualityLevel());
-        int vs = PlayerPrefs.GetInt(KEY_VSYNC, 1);
+        const string KEY_VOL = "opt_master_vol";
+        const string KEY_QUAL = "opt_quality";
+        const string KEY_VSYNC = "opt_vsync";
 
-        masterVol.SetValueWithoutNotify(vol);
-        quality.SetValueWithoutNotify(Mathf.Clamp(q, 0, QualitySettings.names.Length - 1));
-        if (vSyncToggle) vSyncToggle.SetIsOnWithoutNotify(vs == 1);
+        void Start()
+        {
+            // ï¿½Ê±ï¿½ UI ï¿½Â¾ï¿½
+            quality.ClearOptions();
+            var customNames = new System.Collections.Generic.List<string> { "High", "Middle", "Low" };
+            quality.AddOptions(customNames);
 
-        // Áï½Ã Àû¿ë
-        ApplyVolume(vol);
-        ApplyQuality(q);
-        ApplyVSync(vs == 1);
+            // ï¿½Îµï¿½
+            float vol = PlayerPrefs.GetFloat(KEY_VOL, 1f);
+            int q = PlayerPrefs.GetInt(KEY_QUAL, QualitySettings.GetQualityLevel());
+            int vs = PlayerPrefs.GetInt(KEY_VSYNC, 1);
 
-        // ¸®½º³Ê
-        masterVol.onValueChanged.AddListener(v => { ApplyVolume(v); PlayerPrefs.SetFloat(KEY_VOL, v); });
-        quality.onValueChanged.AddListener(i => { ApplyQuality(i); PlayerPrefs.SetInt(KEY_QUAL, i); });
-        if (vSyncToggle) vSyncToggle.onValueChanged.AddListener(on => { ApplyVSync(on); PlayerPrefs.SetInt(KEY_VSYNC, on ? 1 : 0); });
+            masterVol.SetValueWithoutNotify(vol);
+            quality.SetValueWithoutNotify(Mathf.Clamp(q, 0, QualitySettings.names.Length - 1));
+            if (vSyncToggle) vSyncToggle.SetIsOnWithoutNotify(vs == 1);
 
-        btnClose.onClick.AddListener(() => gameObject.SetActive(false));
+            // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            ApplyVolume(vol);
+            ApplyQuality(q);
+            ApplyVSync(vs == 1);
+
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            masterVol.onValueChanged.AddListener(v => { ApplyVolume(v); PlayerPrefs.SetFloat(KEY_VOL, v); });
+            quality.onValueChanged.AddListener(i => { ApplyQuality(i); PlayerPrefs.SetInt(KEY_QUAL, i); });
+            if (vSyncToggle) vSyncToggle.onValueChanged.AddListener(on => { ApplyVSync(on); PlayerPrefs.SetInt(KEY_VSYNC, on ? 1 : 0); });
+
+            btnClose.onClick.AddListener(() => gameObject.SetActive(false));
+        }
+
+        void ApplyVolume(float v) => AudioListener.volume = Mathf.Clamp01(v);
+        void ApplyQuality(int i) { i = Mathf.Clamp(i, 0, QualitySettings.names.Length - 1); QualitySettings.SetQualityLevel(i, true); }
+        void ApplyVSync(bool on) { QualitySettings.vSyncCount = on ? 1 : 0; }
     }
-
-    void ApplyVolume(float v) => AudioListener.volume = Mathf.Clamp01(v);
-    void ApplyQuality(int i) { i = Mathf.Clamp(i, 0, QualitySettings.names.Length - 1); QualitySettings.SetQualityLevel(i, true); }
-    void ApplyVSync(bool on) { QualitySettings.vSyncCount = on ? 1 : 0; }
 }

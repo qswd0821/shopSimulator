@@ -12,9 +12,10 @@ namespace Customer
         private void Awake()
         {
             _customer = GetComponent<Customer>();
+            enabled = false;
         }
 
-        private void Start()
+        private void OnEnable()
         {
             // 손님 정보 초기 세팅 후 진입
             ChangeState(new CustomerEnteringState());
@@ -23,6 +24,16 @@ namespace Customer
         private void Update()
         {
             _currentState = CurrentState.GetType().Name;
+        }
+
+        public void StartState()
+        {
+            ChangeState(new CustomerEnteringState());
+        }
+
+        public void StartState(ICustomerState state)
+        {
+            ChangeState(state);
         }
 
         private void ChangeState(ICustomerState next)

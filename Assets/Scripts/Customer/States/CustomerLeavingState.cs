@@ -16,9 +16,9 @@ namespace Customer
             _customer = customer;
             _stateCallback = callback;
 
-            _customer.Movement.MoveTo(CustomerManager.Instance.entrancePosition, b =>
+            _customer.Movement.MoveTo(CustomerManager.Instance.EntrancePosition, b =>
             {
-                _customer.Movement.MoveTo(CustomerManager.Instance.exitPosition, b =>
+                _customer.Movement.MoveTo(CustomerManager.Instance.ExitPosition, b =>
                 {
                     // end of life
                     _stateCallback.Invoke(null);

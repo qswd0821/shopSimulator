@@ -91,7 +91,7 @@ public class Player : MonoBehaviour
         // 실제 레이캐스트
         if (Physics.Raycast(ray, out RaycastHit hit, RayDistance))
         {
-            Debug.Log("충돌한 오브젝트: " + hit.collider.name);
+            //Debug.Log("충돌한 오브젝트: " + hit.collider.name);
 
             // GameObject 자체
             GameObject obj = hit.collider.gameObject;

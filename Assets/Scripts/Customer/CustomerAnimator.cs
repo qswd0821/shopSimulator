@@ -17,7 +17,7 @@ namespace Customer
         public const string MoveStateName = "Move";
         public const string PickUpStateName = "PickUp";
         public const string ConfuseStateName = "Confuse";
-        public const string WaitPaymentStateName = "WaitPayment";
+        public const string WaitPaymentStateName = "WaitingPaymentStart";
 
         private static readonly int SpeedParamHash = Animator.StringToHash(SpeedFloatParam);
         private static readonly int TurnParamHash = Animator.StringToHash(TurnFloatParam);
@@ -44,7 +44,7 @@ namespace Customer
                 _navAgent = GetComponent<NavMeshAgent>();
         }
 
-        void Awake()
+        void OnEnable()
         {
             if (_animator == null)
                 _animator = GetComponentInChildren<Animator>();

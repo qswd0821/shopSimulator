@@ -87,7 +87,10 @@ public class Pos : MonoBehaviour
     {
         Vector3 WaitLinePos = GetWaitingLinePosition();
         ListCustomer.Add(_custormer);
-        _custormer.Movement.MoveTo(WaitLinePos, (_) => { OnCustomerArrivedAtLine(_custormer); });
+        _custormer.Movement.MoveTo(WaitLinePos, (_) => {
+            _custormer.OnWaitngLineMoveComplete();
+            OnCustomerArrivedAtLine(_custormer); 
+        });
     }
 
     Vector3 GetWaitingLinePosition()

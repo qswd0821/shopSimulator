@@ -47,18 +47,34 @@ public class Product : MonoBehaviour
         StartCoroutine(IMoveTo(_pos));
     }
 
-    public IEnumerator IMoveTo(Vector3 _pos)
+    public IEnumerator IMoveTo(Vector3 _pos,bool _islocal = false)
     {
         float t = 0f;
-        Vector3 start = transform.position;
         float duration = 0.5f;
 
-        while (t < 1f)
+        if(_islocal)
         {
-            t += Time.deltaTime / duration;
-            transform.position = Vector3.Lerp(start, _pos, t);
-            yield return null;
+            Vector3 start = transform.localPosition;
+
+            while (t < 1f)
+            {
+                t += Time.deltaTime / duration;
+                transform.localPosition = Vector3.Lerp(start, _pos, t);
+                yield return null;
+            }
+            transform.localPosition = _pos;
         }
-        transform.position = _pos;
+        else
+        {
+            Vector3 start = transform.position;
+
+            while (t < 1f)
+            {
+                t += Time.deltaTime / duration;
+                transform.position = Vector3.Lerp(start, _pos, t);
+                yield return null;
+            }
+            transform.position = _pos;
+        }
     }
 }

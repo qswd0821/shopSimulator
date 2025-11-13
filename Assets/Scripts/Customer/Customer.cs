@@ -7,45 +7,63 @@ namespace Customer
     /// <summary>
     /// Customer의 가장 최상위 클래스
     /// </summary>
-    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator), typeof(CustomerInteractor))]
+    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator), typeof(CustomerInteractor)), RequireComponent(
+         typeof(CustomerStateMachine))]
     public class Customer : MonoBehaviour
     {
         public CustomerMovement Movement { get; private set; }
         public CustomerAnimator Animator { get; private set; }
         public CustomerInteractor Interactor { get; private set; }
+        public CustomerStateMachine StateMachine { get; private set; }
 
-        [Header("Customer")] public GameObject customerModel;
-        public GameObject customerCanvas;
+        [Header("Customer")] public GameObject customerCanvas;
         public float paymentPatientTime = 15;
         public int wishlistInitSize = 3;
-
-        // Environment
-        public Vector3 startPosition;
-        public Vector3 exitPosition;
-        public Vector3 entrancePosition;
 
         public Queue<Shelf> Shelves = new();
         public List<Product> Wishlist = new();
         public List<Product> Inventory = new();
 
-        public bool hasCompletedPayment;
+        [HideInInspector] public bool hasCompletedPayment;
+        [HideInInspector] public bool HasCompletedWaitngMovement;
 
         private void Awake()
         {
             Movement = GetComponent<CustomerMovement>();
             Animator = GetComponent<CustomerAnimator>();
             Interactor = GetComponent<CustomerInteractor>();
+            StateMachine = GetComponent<CustomerStateMachine>();
 
-            Init();
+            Movement.enabled = false;
+            Animator.enabled = false;
+            Interactor.enabled = false;
+            StateMachine.enabled = false;
         }
 
-        private void Init()
+        public void Init(GameObject model, ICustomerState testState = null)
         {
+            SetModel(model);
             SetWishlist();
             FindShelves();
-            CustomerManager.Instance.startPosition.y = transform.localPosition.y;
-            CustomerManager.Instance.exitPosition.y = transform.localPosition.y;
-            CustomerManager.Instance.entrancePosition.y = transform.localPosition.y;
+
+            Movement.enabled = true;
+            Animator.enabled = true;
+            Interactor.enabled = true;
+            StateMachine.enabled = true;
+
+            if (testState == null)
+                StateMachine.StartState();
+            else
+                StateMachine.StartState(testState);
+        }
+
+        private void SetModel(GameObject model)
+        {
+            model.transform.SetParent(transform, false);
+            model.transform.localPosition = Vector3.zero;
+            model.transform.localRotation = Quaternion.identity;
+            model.transform.localScale = Vector3.one;
+            model.SetActive(true);
         }
 
         public void DestroyCustomer()
@@ -74,10 +92,10 @@ namespace Customer
 
         private void FindShelves()
         {
-            var foundShelves = FindObjectsByType<Shelf>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var foundShelves = Shared.GameManager.ListShelf;
 
             // 랜덤한 순서로 섞기
-            for (int i = foundShelves.Length - 1; i > 0; i--)
+            for (int i = foundShelves.Count - 1; i > 0; i--)
             {
                 int randomIndex = Random.Range(0, i + 1);
                 (foundShelves[i], foundShelves[randomIndex]) = (foundShelves[randomIndex], foundShelves[i]);
@@ -89,6 +107,10 @@ namespace Customer
             }
         }
 
+        public void OnWaitngLineMoveComplete()
+        {
+            HasCompletedWaitngMovement = true;
+        }
 
         public void OnPaymentCompleted()
         {
@@ -97,11 +119,6 @@ namespace Customer
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(startPosition, Vector3.one * 1f);
-            Gizmos.DrawWireCube(exitPosition, Vector3.one * 1f);
-            Gizmos.DrawWireCube(entrancePosition, Vector3.one * 1f);
-
             Gizmos.color = Color.red;
             foreach (var shelf in Shelves)
             {

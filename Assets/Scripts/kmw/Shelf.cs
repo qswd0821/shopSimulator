@@ -12,19 +12,25 @@ public class Shelf : Item
 
     [SerializeField] Product Product;
 
+    [SerializeField] bool IsCheckPointShelf;
+
     public bool PreGenerated;
     public int Count;
     public int Row;
     public int Col;
     public float Xspacing = 30f;
     public float Yspacing = 30f;
+    
 
     protected override void Init()
     {
         base.Init();
         IsAttachable = false;
         Id = 15;
-        Shared.GameManager.ListShelf.Add(this);
+        if(IsCheckPointShelf == false)
+        {
+            Shared.GameManager.ListShelf.Add(this);
+        }
 
         // 사전 생성
         if (PreGenerated)
@@ -38,8 +44,8 @@ public class Shelf : Item
         for (int i = 0; i < Count; ++i)
         {
             Product product = Instantiate(Product);
+            product.transform.SetParent(BasePoint, false);
             product.transform.localPosition = GetSlotPosition(i);
-            product.transform.SetParent(BasePoint, true);
             product.transform.localRotation = Quaternion.identity;
             product.transform.localScale = Vector3.one;
 
@@ -59,14 +65,10 @@ public class Shelf : Item
 
     IEnumerator IAddProduct(Product _product)
     {
-        yield return StartCoroutine(_product.IMoveTo(GetSlotPosition(GetCount())));
-
-        _product.transform.SetParent(BasePoint, true);
+        _product.transform.SetParent(BasePoint, false);
         _product.transform.localRotation = Quaternion.identity;
-        // _product.transform.localScale = new Vector3(15f / transform.localScale.x, 
-        //     15f / transform.localScale.y, 
-        //     15f / transform.localScale.z);
-        //_product.transform.localScale = Vector3.one;
+
+        yield return StartCoroutine(_product.IMoveTo(GetSlotPosition(GetCount()),true));
 
         QueProduct.Enqueue(_product);
     }
@@ -80,7 +82,7 @@ public class Shelf : Item
     {
         int r = _index / Col;
         int c = _index % Col;
-        return BasePoint.position + new Vector3(c * Xspacing, 0.0f, -r * Yspacing);
+        return new Vector3(c * Xspacing, 0.0f, -r * Yspacing);
     }
 
     public Product GetProduct(int _id)
