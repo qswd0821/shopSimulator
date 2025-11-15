@@ -7,23 +7,19 @@ namespace Customer
     /// <summary>
     /// Customer의 가장 최상위 클래스
     /// </summary>
-    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator), typeof(CustomerInteractor))]
-    public class Customer : MonoBehaviour
+    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator)), RequireComponent(
+         typeof(CustomerStateMachine))]
+    public class Customer : MonoBehaviour, ICustomerInteraction
     {
         public CustomerMovement Movement { get; private set; }
         public CustomerAnimator Animator { get; private set; }
-        public CustomerInteractor Interactor { get; private set; }
+        public CustomerStateMachine StateMachine { get; private set; }
 
-        [Header("Customer")] public GameObject customerModel;
-        public GameObject customerCanvas;
-        public float paymentPatientTime = 15;
+        [Header("Customer")] public GameObject customerCanvas;
         public int wishlistInitSize = 3;
+        public float ragdollDelayBeforeDestroyed = 3f;
 
-        // Environment
-        public Vector3 startPosition;
-        public Vector3 exitPosition;
-        public Vector3 entrancePosition;
-
+        public ICustomerState DefaultState = new CustomerEnteringState();
         public Queue<Shelf> Shelves = new();
         public List<Product> Wishlist = new();
         public List<Product> Inventory = new();
@@ -35,18 +31,33 @@ namespace Customer
         {
             Movement = GetComponent<CustomerMovement>();
             Animator = GetComponent<CustomerAnimator>();
-            Interactor = GetComponent<CustomerInteractor>();
+            StateMachine = GetComponent<CustomerStateMachine>();
 
-            Init();
+            Movement.enabled = false;
+            Animator.enabled = false;
+            StateMachine.enabled = false;
         }
 
-        private void Init()
+        public void Init(GameObject model, ICustomerState initState = null)
         {
+            SetModel(model);
             SetWishlist();
             FindShelves();
-            CustomerManager.Instance.startPosition.y = transform.localPosition.y;
-            CustomerManager.Instance.exitPosition.y = transform.localPosition.y;
-            CustomerManager.Instance.entrancePosition.y = transform.localPosition.y;
+
+            Movement.enabled = true;
+            Animator.enabled = true;
+            StateMachine.enabled = true;
+
+            StateMachine.StartState(initState ?? DefaultState);
+        }
+
+        private void SetModel(GameObject model)
+        {
+            model.transform.SetParent(transform, false);
+            model.transform.localPosition = Vector3.zero;
+            model.transform.localRotation = Quaternion.identity;
+            model.transform.localScale = Vector3.one;
+            model.SetActive(true);
         }
 
         public void DestroyCustomer()
@@ -94,6 +105,7 @@ namespace Customer
         {
             HasCompletedWaitngMovement = true;
         }
+
         public void OnPaymentCompleted()
         {
             hasCompletedPayment = true;
@@ -101,16 +113,30 @@ namespace Customer
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(startPosition, Vector3.one * 1f);
-            Gizmos.DrawWireCube(exitPosition, Vector3.one * 1f);
-            Gizmos.DrawWireCube(entrancePosition, Vector3.one * 1f);
-
             Gizmos.color = Color.red;
             foreach (var shelf in Shelves)
             {
                 Gizmos.DrawWireCube(shelf.transform.position, Vector3.one * 1.5f);
             }
+        }
+
+        public void Attack()
+        {
+            // Enable ragdoll physics
+            Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>();
+            foreach (Rigidbody rb in rigidbodies)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.AddForce(Vector3.one * Random.Range(-1f, 1f));
+            }
+
+            Animator.DisableAnimator();
+
+            Movement.enabled = false;
+            Animator.enabled = false;
+            StateMachine.enabled = false;
+
+            Invoke(nameof(DestroyCustomer), ragdollDelayBeforeDestroyed);
         }
     }
 }

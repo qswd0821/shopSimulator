@@ -17,8 +17,8 @@ namespace Customer
             _stateCallback = callback;
 
             // 손님 정보 세팅 (모델, 목표 구매 리스트 등)
-            customer.transform.position = CustomerManager.Instance.startPosition;
-            customer.Movement.MoveTo(CustomerManager.Instance.entrancePosition, OnArrived);
+            customer.transform.position = CustomerManager.Instance.InitPosition;
+            customer.Movement.MoveTo(CustomerManager.Instance.EntrancePosition, OnArrived);
         }
 
         private void OnArrived(bool succeed)
