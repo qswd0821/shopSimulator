@@ -7,19 +7,19 @@ namespace Customer
     /// <summary>
     /// Customer의 가장 최상위 클래스
     /// </summary>
-    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator), typeof(CustomerInteractor)), RequireComponent(
+    [RequireComponent(typeof(CustomerMovement), typeof(CustomerAnimator)), RequireComponent(
          typeof(CustomerStateMachine))]
-    public class Customer : MonoBehaviour
+    public class Customer : MonoBehaviour, ICustomerInteraction
     {
         public CustomerMovement Movement { get; private set; }
         public CustomerAnimator Animator { get; private set; }
-        public CustomerInteractor Interactor { get; private set; }
         public CustomerStateMachine StateMachine { get; private set; }
 
         [Header("Customer")] public GameObject customerCanvas;
-        public float paymentPatientTime = 15;
         public int wishlistInitSize = 3;
+        public float ragdollDelayBeforeDestroyed = 3f;
 
+        public ICustomerState DefaultState = new CustomerEnteringState();
         public Queue<Shelf> Shelves = new();
         public List<Product> Wishlist = new();
         public List<Product> Inventory = new();
@@ -31,16 +31,14 @@ namespace Customer
         {
             Movement = GetComponent<CustomerMovement>();
             Animator = GetComponent<CustomerAnimator>();
-            Interactor = GetComponent<CustomerInteractor>();
             StateMachine = GetComponent<CustomerStateMachine>();
 
             Movement.enabled = false;
             Animator.enabled = false;
-            Interactor.enabled = false;
             StateMachine.enabled = false;
         }
 
-        public void Init(GameObject model, ICustomerState testState = null)
+        public void Init(GameObject model, ICustomerState initState = null)
         {
             SetModel(model);
             SetWishlist();
@@ -48,13 +46,9 @@ namespace Customer
 
             Movement.enabled = true;
             Animator.enabled = true;
-            Interactor.enabled = true;
             StateMachine.enabled = true;
 
-            if (testState == null)
-                StateMachine.StartState();
-            else
-                StateMachine.StartState(testState);
+            StateMachine.StartState(initState ?? DefaultState);
         }
 
         private void SetModel(GameObject model)
@@ -124,6 +118,25 @@ namespace Customer
             {
                 Gizmos.DrawWireCube(shelf.transform.position, Vector3.one * 1.5f);
             }
+        }
+
+        public void Attack()
+        {
+            // Enable ragdoll physics
+            Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>();
+            foreach (Rigidbody rb in rigidbodies)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.AddForce(Vector3.one * Random.Range(-1f, 1f));
+            }
+
+            Animator.DisableAnimator();
+
+            Movement.enabled = false;
+            Animator.enabled = false;
+            StateMachine.enabled = false;
+
+            Invoke(nameof(DestroyCustomer), ragdollDelayBeforeDestroyed);
         }
     }
 }

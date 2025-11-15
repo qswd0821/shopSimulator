@@ -1108,6 +1108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugUI: 1
+  currentCustomer: {fileID: 0}
   customerPrefab: {fileID: 1168122187877899008, guid: 94e3974193897a24d85e8b52d9d065c8, type: 3}
   customerModelPrefab: {fileID: 4077434319977189870, guid: 33e64fbd7a9adf04d9de9bb38ad21574, type: 3}
   init: {fileID: 1471947765}

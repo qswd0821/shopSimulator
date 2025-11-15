@@ -52,6 +52,14 @@ namespace Customer
                 _navAgent = GetComponent<NavMeshAgent>();
         }
 
+        // When a customer is dead
+        public void DisableAnimator()
+        {
+            if (_animator)
+                _animator.enabled = false;
+            enabled = false;
+        }
+
         void Update()
         {
             UpdateAnimatorParameters();

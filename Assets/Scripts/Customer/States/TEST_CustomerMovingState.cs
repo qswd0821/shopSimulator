@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 namespace Customer
 {
-    public class CustomerTestMovingState : ICustomerState
+    public class TEST_CustomerMovingState : ICustomerState
     {
         private Customer _customer;
         private Shelf[] _shelve;

@@ -1,13 +1,14 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Customer
 {
     public class CustomerStateMachine : MonoBehaviour
     {
-        public ICustomerState CurrentState { get; private set; }
+        private ICustomerState CurrentState { get; set; } = null;
 
         private Customer _customer;
-        private string _currentState;
+        public string _currentState;
 
         private void Awake()
         {
@@ -15,24 +16,21 @@ namespace Customer
             enabled = false;
         }
 
-        private void OnEnable()
-        {
-            // 손님 정보 초기 세팅 후 진입
-            ChangeState(new CustomerEnteringState());
-        }
-
         private void Update()
         {
-            _currentState = CurrentState.GetType().Name;
+            _currentState = CurrentState?.GetType().Name;
         }
 
-        public void StartState()
+        private void OnDisable()
         {
-            ChangeState(new CustomerEnteringState());
+            CurrentState?.OnExit();
+            CurrentState = null;
         }
 
+        // 한 번만 호출 가능
         public void StartState(ICustomerState state)
         {
+            if (CurrentState != null) return;
             ChangeState(state);
         }
 

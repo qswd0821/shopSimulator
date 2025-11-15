@@ -18,6 +18,16 @@ namespace Customer
             _movementCallback = null;
         }
 
+        private void OnEnable()
+        {
+            _navMeshAgent.enabled = true;
+        }
+        
+        private void OnDisable()
+        {
+            _navMeshAgent.enabled = false;
+        }
+
         public void MoveTo(Vector3 destination, Action<bool> onArrived = null)
         {
             _movementCallback = onArrived;

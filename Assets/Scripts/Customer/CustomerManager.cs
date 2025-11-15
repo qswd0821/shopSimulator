@@ -24,6 +24,7 @@ namespace Customer
         private static CustomerManager _instance;
 
         [Header("Debug")] [SerializeField] private bool showDebugUI = false;
+        [SerializeField] private Customer currentCustomer = null;
 
         [Header("Customer")] [SerializeField] private GameObject customerPrefab;
         [SerializeField] private GameObject customerModelPrefab;
@@ -80,17 +81,16 @@ namespace Customer
             }
         }
 
-        public void CreateCustomer(ICustomerState state = null)
+        #region DEBUG
+
+        private void CreateCustomer(ICustomerState state = null)
         {
-            var customer = Instantiate(customerPrefab).GetComponent<Customer>();
+            currentCustomer = Instantiate(customerPrefab).GetComponent<Customer>();
             var customerModel = Instantiate(customerModelPrefab);
             int modelTypeCount = 19;
             customerModel.transform.GetChild(Random.Range(0, modelTypeCount)).gameObject.SetActive(true);
 
-            if (state == null)
-                customer.Init(customerModel);
-            else
-                customer.Init(customerModel, state);
+            currentCustomer.Init(customerModel, state);
         }
 
         private void OnDrawGizmosSelected()
@@ -115,10 +115,26 @@ namespace Customer
                 CreateCustomer();
             }
 
-            if (GUILayout.Button("Create TestCustomer"))
+            if (GUILayout.Button("Create TEST_IDle Customer"))
             {
-                CreateCustomer(new CustomerTestMovingState());
+                CreateCustomer(new TEST_CustomerIdleState());
+            }
+
+            if (currentCustomer)
+            {
+                if (GUILayout.Button("Attack Customer"))
+                {
+                    if (currentCustomer.TryGetComponent(out ICustomerInteraction interaction))
+                    {
+                        interaction.Attack();
+                        Debug.Log("Attacked");
+                    }
+
+                    currentCustomer = null;
+                }
             }
         }
+
+        #endregion
     }
 }

@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 6708632448946224093}
   - component: {fileID: 4580269094460054459}
   - component: {fileID: 5564906862376425703}
-  - component: {fileID: 1777696679705416987}
   m_Layer: 0
   m_Name: Customer
   m_TagString: Untagged
@@ -97,8 +96,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   customerCanvas: {fileID: 3581054016808882390}
-  paymentPatientTime: 15
   wishlistInitSize: 3
+  ragdollDelayBeforeDestroyed: 3
   Wishlist: []
   Inventory: []
   hasCompletedPayment: 0
@@ -128,6 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9c95fb6c1b6420ca664bf8e29449d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _currentState: 
 --- !u!114 &5564906862376425703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,18 +142,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speedSmoothTime: 0.15
   turnSmoothTime: 0.1
---- !u!114 &1777696679705416987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1168122187877899008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4581829d217040e68de99612354898c5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1536122589174085423
 GameObject:
   m_ObjectHideFlags: 0
